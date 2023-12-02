@@ -26,13 +26,14 @@ Features
 
   ![Fig_01](https://github.com/nghia-vo/broh5/raw/main/figs/fig_01.png)
 
+- Broh5 can view compressed hdf files by using compressors from
+  [hdf5plugin](https://pypi.org/project/hdf5plugin/).
+
 - The codebase is designed using the RUI (Rendering-Utilities-Interactions) 
   concept, which is known as the MVC (Model-View-Controller) pattern in the 
   GUI development community. The name 'MVC' may not be very intuitive for 
   those new to GUI development. However, this design allows for the development 
-  of complex software and makes it easier to extend its capabilities. To make 
-  things easier for beginners, a monolithic approach to the codebase is also 
-  provided for comparison.
+  of complex software and makes it easier to extend its capabilities.
 
 Installation
 ------------
@@ -72,7 +73,7 @@ Installation
   
     Use git to clone the broh5 repository:
     ```commandline
-    git clone https://github.com/nghia-vo/broh5.git broh5
+    git clone https://github.com/algotom/broh5.git broh5
     ```
     Navigate to the cloned directory:
     ```commandline
@@ -108,8 +109,9 @@ Installation
     python generate_exe.py
     ```
     Navigate to the **dist** directory and run
-      ```commandline
-    ./broh5.exe
+
+    ```commandline
+    broh5.exe    
     ```
     the generated file can be moved to another location for more convenient usage.
 
@@ -118,12 +120,11 @@ Documentation
 
 As a GUI-based software, broh5 is designed to be intuitive. Within the codebase, 
 the naming conventions for modules and functions, as well as their organization, 
-are self-explanatory. For those unfamiliar with NiceGui or the MVC design pattern, 
-starting with the monolithic codebase is recommended. 
+are self-explanatory. 
 
 Brief functionalities of broh5:
 
-- Users can open an hdf file by clicking the "Select file" button. Multiple hdf 
+- Users can open a hdf file by clicking the "Select file" button. Multiple hdf 
   files can be opened sequentially.
 - Upon opening, the tree structure of the current hdf file is displayed, allowing 
   users to navigate different branches (hdf groups) or leaves (hdf datasets). 
