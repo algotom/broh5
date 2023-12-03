@@ -1,5 +1,5 @@
 """
-Module for GUI components:
+Module for constructing GUI components:
     -   Main window.
     -   Dialog for selecting a file.
     -   Dialog for saving a file.
@@ -38,9 +38,55 @@ TREE_BGR_COLOR = "#f8f8ff"
 
 class GuiRendering:
     """
-    Build the GUI
-    """
+    A class to build the graphical user interface for an HDF viewer.
 
+    This class creates various UI elements like headers, buttons,
+    sliders, tables, and plots to facilitate user interaction with HDF data.
+
+    Attributes
+    ----------
+    fig_size : tuple
+        Dimensions for the figure in the UI.
+    tree_container : UI column
+        Container for the HDF tree structure.
+    select_file_button : UI button
+        Button to trigger file selection.
+    file_path_display : UI label
+        Label to display selected file path.
+    hdf_key_display : UI label
+        Label to display HDF key.
+    hdf_value_display : UI label
+        Label to display HDF value.
+    axis_list : UI select
+        Dropdown to select axis for slicing.
+    cmap_list : UI select
+        Dropdown to select color map for plots.
+    save_image_button : UI button
+        Button to save current image.
+    display_type : UI select
+        Dropdown to choose the display type (plot or table).
+    marker_list : UI select
+        Dropdown to select marker type for plots.
+    save_data_button : UI button
+        Button to save current data.
+    main_slider : UI slider
+        Slider to navigate through slices of 3D data.
+    main_table : UI table
+        Table to display data in tabular form.
+    main_plot : UI pyplot
+        Pyplot element to display plots.
+    min_slider : UI slider
+        Slider to adjust the minimum value for image contrast.
+    max_slider : UI slider
+        Slider to adjust the maximum value for image contrast.
+    reset_button : UI button
+        Button to reset adjustments.
+
+    Methods
+    -------
+    init_gui()
+        Initializes and constructs the GUI elements.
+    """
     def __init__(self):
         super().__init__()
         # Initial parameters
@@ -69,6 +115,12 @@ class GuiRendering:
         self.init_gui()
 
     def init_gui(self):
+        """
+        Initializes and constructs the various elements of the GUI.
+
+        This method sets up headers, drawers, rows, labels, buttons, sliders,
+        tables, and plots to create an interactive user interface.
+        """
         # For the header
         with ui.header().style("background-color: " + HEADER_COLOR).classes(
                 "items-center justify-between"):
@@ -158,26 +210,36 @@ class FilePicker(ui.dialog):
                  show_hidden_files: bool = False,
                  allowed_extensions: Optional[List[str]] = None) -> None:
         """
-        This is a simple file picker that allows users to select a file from
-        the local filesystem where the app is running.
-        Codes are adapted from an example of NiceGUI:
+        A dialog class for file picking in the GUI. Codes are adapted from an
+        example of NiceGUI:
         https://github.com/zauberzeug/nicegui/tree/main/examples/local_file_picker
+
+        Allows users to browse and select files from the local filesystem where
+        the application is running.
 
         Parameters
         ----------
-
         directory : str
-            Starting directory.
-        upper_limit : str
-            Stopping directory (None: no limit).
-        show_hidden_files : bool
-            Whether to show hidden files.
-        allowed_extensions : list of str
-            Only show files with given extension. E.g. ['hdf', 'h5', 'nxs']
+            The starting directory for the file picker.
+        upper_limit : str, optional
+            The upper directory limit for browsing. None by default.
+        show_hidden_files : bool, optional
+            Flag to show hidden files. False by default.
+        allowed_extensions : List of str, optional
+            List of allowed file extensions for filtering. None by default.
 
-        Returns
+        Methods
         -------
-            file path.
+        check_extension(filename: str)
+            Check if the given filename has an allowed extension.
+        add_drives_toggle()
+            Add a toggle for drive selection on Windows systems.
+        update_grid()
+            Update the file grid based on the current directory and filters.
+        handle_double_click(GenericEventArguments)
+            Handle double click events on the file grid.
+        handle_ok()
+            Handle the OK button, click to submit the selected file path.
         """
         super().__init__()
         self.show_hidden_files = show_hidden_files
@@ -278,22 +340,35 @@ class FileSaver(ui.dialog):
                  show_hidden_files: bool = False,
                  title: Optional[str] = 'File name') -> None:
         """
-        This is a simple file saver dialog that allows users to specify a
-        file name and where the file should be saved.
+        A dialog class for saving files in the GUI.
+
+        Allows users to specify a file name and directory for saving files.
 
         Parameters
         ----------
-
         directory : str
-            Starting directory.
-        upper_limit : str
-            Stopping directory (None: no limit).
-        show_hidden_files : bool
-            Whether to show hidden files.
+            Starting directory for the file saver.
+        upper_limit : str, optional
+            Upper directory limit for browsing. None by default.
+        show_hidden_files : bool, optional
+            Flag to show hidden files. False by default.
+        title : str, optional
+            Title for the file-name input-field. 'File name' by default.
 
-        Returns
+        Methods
         -------
-            file path.
+        add_drives_toggle()
+            Add a toggle for drive selection on Windows systems.
+        update_grid() -> None
+            Update the file grid based on the current directory.
+        handle_double_click(e: GenericEventArguments) -> None
+            Handle double-click events on the file grid.
+        handle_save()
+            Handle the Save button, click to submit the specified file path.
+        create_folder_dialog()
+            Open a dialog for creating a new folder.
+        create_folder(folder_name: str, dialog: ui.dialog)
+            Create a new folder with the specified name.
         """
         super().__init__()
         self.show_hidden_files = show_hidden_files

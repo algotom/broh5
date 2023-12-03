@@ -19,6 +19,14 @@ from PIL import Image
 
 
 def get_height_width_screen():
+    """
+    Get the height and width of the current screen.
+
+    Returns
+    -------
+    tuple
+       A tuple of (screen height, screen width).
+    """
     root = tk.Tk()
     screen_width = root.winfo_screenwidth()
     screen_height = root.winfo_screenheight()
@@ -27,6 +35,23 @@ def get_height_width_screen():
 
 
 def __recurse(parent_path, name, obj):
+    """
+    Supplementary function for recursive traversal of HDF5 file structure.
+
+    Parameters
+    ----------
+    parent_path : str
+        The path of the parent group.
+    name : str
+        The name of the current group or dataset.
+    obj : h5py-object
+        The current HDF5 group or dataset.
+
+    Returns
+    -------
+    list
+        A list of dictionaries describing the HDF5 groups and datasets.
+    """
     current_path = f"{parent_path}/{name}" if parent_path else name
     if isinstance(obj, h5py._hl.dataset.Dataset):
         return [{"id": name, "label": current_path}]
@@ -43,7 +68,20 @@ def __recurse(parent_path, name, obj):
 
 
 def hdf_tree_to_dict(hdf_file):
-    """Convert an HDF5 tree to a nested dictionary"""
+    """
+    Convert an HDF5 file structure to a nested dictionary.
+
+    Parameters
+    ----------
+    hdf_file : str
+        Path to the HDF5 file.
+
+    Returns
+    -------
+    dict or str
+        A nested dictionary representing the structure of the HDF5 file,
+        or a string describing an error if one occurs.
+    """
     try:
         hdf_obj1 = h5py.File(hdf_file, 'r')
         result = __recurse("", "", hdf_obj1)
@@ -57,7 +95,21 @@ def hdf_tree_to_dict(hdf_file):
 
 
 def get_hdf_data(file_path, dataset_path):
-    """ Get data type and value from a hdf dataset """
+    """
+    Get data type and value from a specified dataset in an HDF5 file.
+
+    Parameters
+    ----------
+    file_path : str
+        Path to the HDF5 file.
+    dataset_path : str
+        Path to the dataset within the HDF5 file.
+
+    Returns
+    -------
+    tuple
+        A tuple containing the data type and the value of the dataset.
+    """
     with h5py.File(file_path, 'r') as file:
         if dataset_path not in file:
             return "not path", None
@@ -108,8 +160,21 @@ def get_hdf_data(file_path, dataset_path):
 
 def check_external_link(file_path, dataset_path):
     """
-    Checks if the dataset at the specified path is an external link
-    and if it's broken.
+    Check if the dataset at a specified path is an external link and
+    whether it's broken.
+
+    Parameters
+    ----------
+    file_path : str
+        Path to the HDF5 file.
+    dataset_path : str
+        Path to the dataset within the HDF5 file.
+
+    Returns
+    -------
+    tuple
+        A tuple containing a boolean indicating if it's an external link,
+        a boolean indicating if the link is broken, and a message string.
     """
     ext_link = False
     broken = False
@@ -134,8 +199,21 @@ def check_external_link(file_path, dataset_path):
 
 def check_compressed_dataset(file_path, dataset_path):
     """
-    Checks if the specified dataset is compressed including checking for
-    external compression filters.
+    Check if a dataset is compressed, including checking for external
+    compression filters.
+
+    Parameters
+    ----------
+    file_path : str
+        Path to the HDF5 file.
+    dataset_path : str
+        Path to the dataset within the HDF5 file.
+
+    Returns
+    -------
+    tuple
+        A tuple containing two booleans indicating if the dataset is compressed
+        and if it uses external compression filters, and a message string.
     """
     compressed = False
     ext_compressed = False
@@ -164,6 +242,20 @@ def check_compressed_dataset(file_path, dataset_path):
 
 
 def format_table_from_array(data):
+    """
+    Format a NumPy array into a structure suitable for displaying as a table
+    using NiceGUI framework.
+
+    Parameters
+    ----------
+    data : ndarray
+        The NumPy array to format.
+
+    Returns
+    -------
+    tuple
+        A tuple containing the rows and columns formatted for the table.
+    """
     if len(data.shape) == 1:
         data = np.expand_dims(np.asarray(data), 1)
     (height, width) = data.shape[:2]
@@ -186,7 +278,19 @@ def format_table_from_array(data):
 
 def save_image(file_path, mat):
     """
-    Save 2D array to an image.
+    Save a 2D array as an image file.
+
+    Parameters
+    ----------
+    file_path : str
+        Path where the image will be saved.
+    mat : ndarray
+        2D array to be saved as an image.
+
+    Returns
+    -------
+    None or str
+        Returns None if successful, or a string message if an error occurs.
     """
     file_ext = os.path.splitext(file_path)[-1]
     if not ((file_ext == ".tif") or (file_ext == ".tiff")):
@@ -199,12 +303,24 @@ def save_image(file_path, mat):
     try:
         image.save(file_path)
     except Exception as error:
-        return error
+        return str(error)
 
 
 def save_table(file_path, data):
     """
-    Save 1D/2D numpy array to a CSV file.
+    Save a 1D or 2D NumPy array to a CSV file.
+
+    Parameters
+    ----------
+    file_path : str
+        Path where the CSV file will be saved.
+    data : ndarray
+        The 1D or 2D array to be saved.
+
+    Returns
+    -------
+    None or str
+        Returns None if successful, or a string message if an error occurs.
     """
     try:
         data = np.asarray(data)
@@ -222,4 +338,4 @@ def save_table(file_path, data):
             else:
                 return "Data must be a 1D or 2D array"
     except Exception as error:
-        return error
+        return str(error)

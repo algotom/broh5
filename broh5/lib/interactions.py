@@ -1,3 +1,7 @@
+"""
+This module links user interactions to the responses of the Broh5 software.
+"""
+
 import os
 import h5py
 import hdf5plugin
@@ -12,7 +16,60 @@ from broh5.lib.rendering import GuiRendering, FilePicker, FileSaver
 
 class GuiInteraction(GuiRendering):
     """
-    Methods to link actions <-> response of the GUI.
+    A subclass of GuiRendering that provides specific functionalities for
+    interacting with the GUI elements in Broh5.
+
+    This class handles user actions such as file selection, branch/leaf
+    selection in an HDF tree, image saving, or data display; resets and
+    updates the GUI in response to these interactions.
+
+    Attributes
+    ----------
+    current_state : tuple or None
+        Current state of the GUI: file path, HDF key, slider values, ...
+    columns : list or None
+        Columns for displaying data in a table.
+    rows : list or None
+        Rows for displaying data in a table.
+    image : np.ndarray or None
+        Current slice from a 3D dataset.
+    current_slice : tuple or None
+        Information about the current slice being displayed.
+    data_1d_2d : np.ndarray or None
+        Current 1D or 2D data being displayed.
+    timer : UI object
+        To update the GUI in regular intervals.
+
+    Methods
+    -------
+    show_key(ValueChangeEventArguments, str)
+        Display the key of the HDF dataset/group when a tree node is clicked.
+    pick_file()
+        Open a file picker dialog to select a file.
+    display_hdf_tree(str)
+        Display the HDF file structure as an interactive tree.
+    disable_sliders()
+        Disable and reset the sliders for 3D-data slicing.
+    enable_ui_elements_3d_data()
+        Enable UI elements specific to 3D-data display.
+    enable_ui_elements_1d_2d_data()
+        Enable UI elements specific to 1D/2D data display.
+    reset(keep_display=False)
+        Reset the UI elements to their initial states.
+    reset_min_max()
+        Reset the minimum and maximum sliders for image contrast.
+    display_3d_data(data_obj)
+        Display a slice of a 3D dataset as an image.
+    display_1d_2d_data(data_obj, "plot")
+        Display 1D/2D data as a plot or table.
+    show_data()
+        Display data from an HDF file based on the current GUI state.
+    save_image()
+        Save the currently displayed image to a file.
+    save_data()
+        Save the currently displayed 1D/2D data to a file.
+    shutdown()
+        Routine to close the app.
     """
 
     def __init__(self):
@@ -27,7 +84,7 @@ class GuiInteraction(GuiRendering):
         self.image = None
         self.current_slice = None
         self.data_1d_2d = None
-        ui.timer(re.UPDATE_RATE, lambda: self.show_data())
+        self.timer = ui.timer(re.UPDATE_RATE, lambda: self.show_data())
 
     def show_key(self, event: ValueChangeEventArguments, file_path):
         """
@@ -373,3 +430,8 @@ class GuiInteraction(GuiRendering):
                     else:
                         ui.notify(
                             "File is saved at: {}".format(file_path))
+
+    def shutdown(self):
+        """Routine to close the app"""
+        self.timer.cancel()
+        ui.notify("The server has been stopped. You can close this tab!")

@@ -1,18 +1,16 @@
 # BroH5
 (**Bro**)wser-based GUI (**H**)DF(**5**) Viewer in Python
 
-Using web browsers to build GUI (Graphical User Interface) software is 
-becoming increasingly popular due to its ability to run across multiple OS 
-with ease. However, developers usually need to know web programming. 
+Web browser-based GUI software is increasingly popular for its cross-platform 
+compatibility, but typically requires web programming knowledge. 
 
-Fortunately, Python libraries like the [Nicegui](https://nicegui.io/) framework 
-make it simpler, allowing developers to create browser-based GUIs using pure Python. 
-This project uses Nicegui to develop an HDF viewer, demonstrating its potential 
-for writing local apps. While various GUI software options exist for viewing 
-hdf/h5/nxs files; such as hdfviewer, vitables, nexpy, or h5web developed in 
-languages like C, Java, Qt/PyQt, or Html/JavasSript; this is a pioneering 
-project where the HDF viewer is web browser-based but written entirely 
-in Python.
+The [Nicegui](https://nicegui.io/) framework simplifies this, enabling pure 
+Python development of browser-based GUIs. This project leverages Nicegui to 
+create an HDF viewer, showcasing its effectiveness for local app development. 
+Unlike other HDF/H5/NXS file viewers like hdfviewer, vitables, nexpy, or h5web, 
+which are built using C, Java, Qt/PyQt, or HTML/JavaScript; this project is 
+unique in being a web browser-based HDF viewer written entirely in Python 
+with a minimal codebase.
 
 Features
 --------

@@ -21,23 +21,55 @@ Exit the software by pressing: Ctrl + C
 """
 
 
-def handle_shutdown():
+def handle_shutdown(main_app):
+    """
+    Handle the shutdown process of the application.
+    """
+    main_app.shutdown()
     print("\n===============")
     print(" Exit the app!")
     print("===============\n")
 
 
 def signal_handler(*args):
-    handle_shutdown()
+    """
+    Handle the signal for graceful shutdown of the application.
+
+    Parameters
+    ----------
+    *args
+        Variable length argument list.
+    """
     sys.exit(0)
 
 
 def check_port(port):
+    """
+    Check if a given port is available.
+
+    Parameters
+    ----------
+    port : int
+        The port number to check.
+
+    Returns
+    -------
+    bool
+        True if the port is already in use, False otherwise.
+    """
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         return s.connect_ex(('localhost', port)) == 0
 
 
 def parse_args():
+    """
+    Parse command-line arguments.
+
+    Returns
+    -------
+    argparse.Namespace
+        Parsed arguments.
+    """
     parser = argparse.ArgumentParser(description=display_msg,
                                      formatter_class=
                                      argparse.RawDescriptionHelpFormatter)
@@ -51,16 +83,23 @@ def parse_args():
 
 
 def main():
-    signal.signal(signal.SIGINT, signal_handler)
+    """
+    Main function to start the application.
+    """
     args = parse_args()
     if check_port(args.port):
         print("\n!!! Port {} is already in use. Please specify a "
               "different port using --port !!!\n".format(args.port))
         sys.exit(1)
-    GuiInteraction()
-    os.environ["NO_NETIFACES"] = "True"
-    app.on_shutdown(handle_shutdown)
-    ui.run(reload=False, title="Browser-based Hdf Viewer", port=args.port)
+    signal.signal(signal.SIGINT, signal_handler)  # Back-up shutdown
+    try:
+        broh5_app = GuiInteraction()
+        os.environ["NO_NETIFACES"] = "True"
+        app.on_shutdown(lambda: handle_shutdown(broh5_app))
+        ui.run(reload=False, title="Browser-based Hdf Viewer", port=args.port)
+    except Exception as error:
+        print(f"An error occurred: {error}")
+        sys.exit(0)
 
 
 if __name__ in {"__main__", "__mp_main__"}:
