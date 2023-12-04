@@ -18,11 +18,3 @@ Interactions
 
 .. toctree::
    api/broh5.lib.interactions
-
-Main
-----
-
-.. toctree::
-   api/broh5.main
-
-
