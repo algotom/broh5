@@ -116,28 +116,22 @@ Installation
 Documentation
 -------------
 
-As a GUI-based software, broh5 is designed to be intuitive. Within the codebase, 
-the naming conventions for modules and functions, as well as their organization, 
-are self-explanatory. 
+- Documentation page: https://broh5.readthedocs.io/
 
-Brief functionalities of broh5:
+- Brief functionalities of broh5:
 
-- Users can open a hdf file by clicking the "Select file" button. Multiple hdf 
-  files can be opened sequentially.
-- Upon opening, the tree structure of the current hdf file is displayed, allowing 
-  users to navigate different branches (hdf groups) or leaves (hdf datasets). 
-  The path to datasets/groups is also displayed. If a dataset contains a string 
-  or a single float/integer value, it will be shown.
-- If dataset is a 3D array, it's presented as an image. Users can slice 
-  through various images and adjust the contrast. Slicing is available for 
-  different axes; however, for large datasets, slicing along axis 2 is disabled 
-  due to processing time.
-- Datasets that are 1D or 2D arrays will be shown as plots or tables, selectively.
-- Users have the option to save images or tables to disk.
-
-Video demonstration:
-
-[![Demo](https://img.youtube.com/vi/lEJ6LKOaIFk/sddefault.jpg)](https://www.youtube.com/watch?v=lEJ6LKOaIFk)
+  + Users can open a hdf file by clicking the "Select file" button. Multiple hdf 
+    files can be opened sequentially.
+  + Upon opening, the tree structure of the current hdf file is displayed, allowing 
+    users to navigate different branches (hdf groups) or leaves (hdf datasets). 
+    The path to datasets/groups is also displayed. If a dataset contains a string 
+    or a single float/integer value, it will be shown.
+  + If dataset is a 3D array, it's presented as an image. Users can slice 
+    through various images and adjust the contrast. Slicing is available for 
+    different axes; however, for large datasets, slicing along axis 2 is disabled 
+    due to processing time.
+  + Datasets that are 1D or 2D arrays will be shown as plots or tables, selectively.
+  + Users have the option to save images or tables to disk.
  
 Author
 ------
