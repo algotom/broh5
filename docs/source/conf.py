@@ -15,7 +15,6 @@
 
 import sys
 import os
-from unittest.mock import MagicMock
 sys.path.insert(0, os.path.abspath('../..'))
 
 # -- General configuration ------------------------------------------------
@@ -120,11 +119,7 @@ autodoc_mock_imports = [
     'matplotlib',
     'nicegui',
     'PIL',
-    'broh5'
 ]
-
-for mod_name in autodoc_mock_imports:
-    sys.modules[mod_name] = MagicMock()
 
 # autoapi_dirs = ['../..']
 
