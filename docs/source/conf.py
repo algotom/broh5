@@ -112,12 +112,13 @@ texinfo_documents = [
 ]
 
 autodoc_mock_imports = [
-    'pillow',
     'h5py',
     'numpy',
     'hdf5plugin',
     'matplotlib',
-    'nicegui'
+    'nicegui',
+    'PIL',
+    'broh5'
 ]
 
 autoapi_dirs = ['../broh5']
