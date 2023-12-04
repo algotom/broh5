@@ -15,6 +15,7 @@
 
 import sys
 import os
+import mock
 sys.path.insert(0, os.path.abspath('../..'))
 
 # -- General configuration ------------------------------------------------
@@ -62,6 +63,7 @@ master_doc = 'index'
 # General information about the project.
 Affiliation = 'NSLS-II, Brookhaven National Lab, US'
 project = 'Broh5'
+author = 'Nghia T. Vo'
 copyright = '2023, Nghia T. Vo, ' + Affiliation
 
 # The full version, including alpha/beta/rc tags.
@@ -93,20 +95,20 @@ latex_documents = [
     ('index',
      project + '.tex',
      project + ' Documentation',
-     Affiliation, 'manual'),
+     author, 'manual'),
 ]
 
 man_pages = [
     ('index', project,
      project + u' Documentation',
-     [Affiliation, ], 1)
+     [author, ], 1)
 ]
 
 texinfo_documents = [
     ('index',
      project,
      project + ' Documentation',
-     Affiliation,
+     author,
      project,
      'Broh5'),
 ]
@@ -118,8 +120,10 @@ autodoc_mock_imports = [
     'matplotlib',
     'nicegui',
     'PIL',
-    'broh5'
 ]
+
+for mod_name in autodoc_mock_imports:
+    sys.modules[mod_name] = mock.Mock()
 
 # autoapi_dirs = ['../..']
 
