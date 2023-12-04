@@ -15,7 +15,3 @@ formats: all
 python:
    install:
       - requirements: docs/envs/requirements-doc.txt
-      - method: pip
-            path: .
-            extra_requirements:
-              - docs
