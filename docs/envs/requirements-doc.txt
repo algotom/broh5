@@ -2,4 +2,3 @@ sphinx >=2
 sphinx_rtd_theme
 nbsphinx
 pandoc
-sphinx-autoapi

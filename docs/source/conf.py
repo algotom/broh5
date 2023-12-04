@@ -29,9 +29,9 @@ extensions = [
     'sphinx.ext.todo',
     'sphinx.ext.autosummary',
     'sphinx.ext.napoleon',
-    'sphinx.ext.viewcode',
-    'autoapi.extension'
+    'sphinx.ext.viewcode'
 ]
+# extensions = ['autoapi.extension']
 
 # Napoleon settings
 napoleon_numpy_docstring = True
@@ -121,7 +121,7 @@ autodoc_mock_imports = [
     'broh5'
 ]
 
-autoapi_dirs = ['../..']
+# autoapi_dirs = ['../..']
 
 autodoc_member_order = 'bysource'
 numfig = True
