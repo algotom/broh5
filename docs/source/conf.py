@@ -120,6 +120,7 @@ autodoc_mock_imports = [
     'matplotlib',
     'nicegui',
     'PIL',
+    'broh5'
 ]
 
 for mod_name in autodoc_mock_imports:
