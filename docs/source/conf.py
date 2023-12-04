@@ -121,7 +121,7 @@ autodoc_mock_imports = [
     'broh5'
 ]
 
-autoapi_dirs = ['../broh5']
+autoapi_dirs = ['../..']
 
 autodoc_member_order = 'bysource'
 numfig = True
