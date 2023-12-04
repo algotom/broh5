@@ -30,6 +30,7 @@ extensions = [
     'sphinx.ext.autosummary',
     'sphinx.ext.napoleon',
     'sphinx.ext.viewcode',
+    'autoapi.extension'
 ]
 
 # Napoleon settings
@@ -118,6 +119,9 @@ autodoc_mock_imports = [
     'matplotlib',
     'nicegui'
 ]
+
+autoapi_dirs = ['../broh5']
+
 autodoc_member_order = 'bysource'
 numfig = True
 numfig_secnum_depth = 2
