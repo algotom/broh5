@@ -15,7 +15,7 @@
 
 import sys
 import os
-import mock
+from unittest.mock import MagicMock
 sys.path.insert(0, os.path.abspath('../..'))
 
 # -- General configuration ------------------------------------------------
@@ -123,7 +123,7 @@ autodoc_mock_imports = [
 ]
 
 for mod_name in autodoc_mock_imports:
-    sys.modules[mod_name] = mock.Mock()
+    sys.modules[mod_name] = MagicMock()
 
 # autoapi_dirs = ['../..']
 
