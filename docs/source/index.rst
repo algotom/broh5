@@ -44,7 +44,7 @@ Table of Contents
 
 .. toctree::
    :numbered:
-   :maxdepth: 3
+   :maxdepth: 4
 
    toc/installation
    toc/structure
