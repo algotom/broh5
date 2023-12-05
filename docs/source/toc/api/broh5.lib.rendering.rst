@@ -5,4 +5,3 @@
     :members:
     :show-inheritance:
     :undoc-members:
-    :exclude-members: init_gui

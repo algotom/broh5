@@ -204,43 +204,42 @@ class GuiRendering:
 
 
 class FilePicker(ui.dialog):
+    """
+    A dialog class for file picking in the GUI. Codes are adapted from an
+    example of NiceGUI:
+    https://github.com/zauberzeug/nicegui/tree/main/examples/local_file_picker
 
+    Allows users to browse and select files from the local filesystem where
+    the application is running.
+
+    Parameters
+    ----------
+    directory : str
+        The starting directory for the file picker.
+    upper_limit : str, optional
+        The upper directory limit for browsing. None by default.
+    show_hidden_files : bool, optional
+        Flag to show hidden files. False by default.
+    allowed_extensions : List of str, optional
+        List of allowed file extensions for filtering. None by default.
+
+    Methods
+    -------
+    check_extension(filename: str)
+        Check if the given filename has an allowed extension.
+    add_drives_toggle()
+        Add a toggle for drive selection on Windows systems.
+    update_grid()
+        Update the file grid based on the current directory and filters.
+    handle_double_click(GenericEventArguments)
+        Handle double click events on the file grid.
+    handle_ok()
+        Handle the OK button, click to submit the selected file path.
+    """
     def __init__(self, directory: str, *,
                  upper_limit: Optional[str] = None,
                  show_hidden_files: bool = False,
                  allowed_extensions: Optional[List[str]] = None) -> None:
-        """
-        A dialog class for file picking in the GUI. Codes are adapted from an
-        example of NiceGUI:
-        https://github.com/zauberzeug/nicegui/tree/main/examples/local_file_picker
-
-        Allows users to browse and select files from the local filesystem where
-        the application is running.
-
-        Parameters
-        ----------
-        directory : str
-            The starting directory for the file picker.
-        upper_limit : str, optional
-            The upper directory limit for browsing. None by default.
-        show_hidden_files : bool, optional
-            Flag to show hidden files. False by default.
-        allowed_extensions : List of str, optional
-            List of allowed file extensions for filtering. None by default.
-
-        Methods
-        -------
-        check_extension(filename: str)
-            Check if the given filename has an allowed extension.
-        add_drives_toggle()
-            Add a toggle for drive selection on Windows systems.
-        update_grid()
-            Update the file grid based on the current directory and filters.
-        handle_double_click(GenericEventArguments)
-            Handle double click events on the file grid.
-        handle_ok()
-            Handle the OK button, click to submit the selected file path.
-        """
         super().__init__()
         self.show_hidden_files = show_hidden_files
         self.allowed_extensions = allowed_extensions
@@ -335,41 +334,40 @@ class FilePicker(ui.dialog):
 
 
 class FileSaver(ui.dialog):
+    """
+    A dialog class for saving files in the GUI.
 
+    Allows users to specify a file name and directory for saving files.
+
+    Parameters
+    ----------
+    directory : str
+        Starting directory for the file saver.
+    upper_limit : str, optional
+        Upper directory limit for browsing. None by default.
+    show_hidden_files : bool, optional
+        Flag to show hidden files. False by default.
+    title : str, optional
+        Title for the file-name input-field. 'File name' by default.
+
+    Methods
+    -------
+    add_drives_toggle()
+        Add a toggle for drive selection on Windows systems.
+    update_grid() -> None
+        Update the file grid based on the current directory.
+    handle_double_click(e: GenericEventArguments) -> None
+        Handle double-click events on the file grid.
+    handle_save()
+        Handle the Save button, click to submit the specified file path.
+    create_folder_dialog()
+        Open a dialog for creating a new folder.
+    create_folder(folder_name: str, dialog: ui.dialog)
+        Create a new folder with the specified name.
+    """
     def __init__(self, directory: str, *, upper_limit: Optional[str] = None,
                  show_hidden_files: bool = False,
                  title: Optional[str] = 'File name') -> None:
-        """
-        A dialog class for saving files in the GUI.
-
-        Allows users to specify a file name and directory for saving files.
-
-        Parameters
-        ----------
-        directory : str
-            Starting directory for the file saver.
-        upper_limit : str, optional
-            Upper directory limit for browsing. None by default.
-        show_hidden_files : bool, optional
-            Flag to show hidden files. False by default.
-        title : str, optional
-            Title for the file-name input-field. 'File name' by default.
-
-        Methods
-        -------
-        add_drives_toggle()
-            Add a toggle for drive selection on Windows systems.
-        update_grid() -> None
-            Update the file grid based on the current directory.
-        handle_double_click(e: GenericEventArguments) -> None
-            Handle double-click events on the file grid.
-        handle_save()
-            Handle the Save button, click to submit the specified file path.
-        create_folder_dialog()
-            Open a dialog for creating a new folder.
-        create_folder(folder_name: str, dialog: ui.dialog)
-            Create a new folder with the specified name.
-        """
         super().__init__()
         self.show_hidden_files = show_hidden_files
         self.drives_toggle = None
