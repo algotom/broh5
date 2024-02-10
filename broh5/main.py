@@ -96,7 +96,10 @@ def main():
         broh5_app = GuiInteraction()
         os.environ["NO_NETIFACES"] = "True"
         app.on_shutdown(lambda: handle_shutdown(broh5_app))
-        ui.run(reload=False, title="Browser-based Hdf Viewer", port=args.port)
+        app.on_startup(
+            lambda: print("Access Broh5 at urls: {}".format(app.urls.union())))
+        ui.run(reload=False, title="Browser-based Hdf Viewer", port=args.port,
+               show_welcome_message=False)
     except Exception as error:
         print(f"An error occurred: {error}")
         sys.exit(0)
