@@ -28,6 +28,7 @@ UPDATE_RATE = 0.2  # second
 DPI = 96
 RATIO = 0.65  # Ratio for adjusting size between image/plot and screen
 MAX_FIG_SIZE = [12.0, 9.0]
+MAX_PLOT_SIZE = [9.0, 7.0]
 INPUT_EXT = ["hdf", "nxs", "h5", "hdf5"]
 PLOT_COLOR = "blue"
 HEADER_COLOR = "#3874c8"
@@ -47,6 +48,8 @@ class GuiRendering:
     ----------
     fig_size : tuple
         Dimensions for the figure in the UI.
+    plot_size : tuple
+        Dimensions for the histogram plot in the UI.
     tree_container : UI column
         Container for the HDF tree structure.
     select_file_button : UI button
@@ -81,6 +84,10 @@ class GuiRendering:
         Slider to adjust the maximum value for image contrast.
     reset_button : UI button
         Button to reset adjustments.
+    histogram_plot : UI pyplot
+        Pyplot element to display histogram of an image.
+    image_info_table : UI table
+        Table to display statistical information of an image.
 
     Methods
     -------
@@ -95,6 +102,8 @@ class GuiRendering:
         wid_size = RATIO * sc_height / DPI
         self.fig_size = (min(hei_size, MAX_FIG_SIZE[0]),
                          min(wid_size, MAX_FIG_SIZE[1]))
+        self.plot_size = (min(hei_size, MAX_PLOT_SIZE[0]),
+                          min(wid_size, MAX_PLOT_SIZE[1]))
         self.tree_container = None
         self.select_file_button = None
         self.file_path_display = None
@@ -112,6 +121,11 @@ class GuiRendering:
         self.min_slider = None
         self.max_slider = None
         self.reset_button = None
+        self.histogram_plot = None
+        self.image_info_table = None
+        self.tab_one = None
+        self.tab_two = None
+        self.panel_tabs = None
         self.init_gui()
 
     def init_gui(self):
@@ -180,27 +194,51 @@ class GuiRendering:
                                        throttle=UPDATE_RATE,
                                        leading_events=False)
 
-            # For display data as an image, table, or plot
-            self.main_table = ui.table(columns=None, rows=None,
-                                       row_key="Index")
-            self.main_plot = ui.pyplot(figsize=self.fig_size,
-                                       close=False).classes("w-full")
+            # Tabs for data visualization and displaying image information
+            tabs = ui.tabs().classes('w-full')
+            with tabs:
+                self.tab_one = ui.tab('Data visualization').style(
+                    "background-color: " + TREE_BGR_COLOR)
+                self.tab_two = ui.tab('Image information').style(
+                    "background-color: " + TREE_BGR_COLOR)
+            self.panel_tabs = ui.tab_panels(tabs, value=self.tab_one).classes(
+                'w-full')
+            with self.panel_tabs:
+                # Tab 1 for data visualization
+                with ui.tab_panel(self.tab_one):
+                    # For display data as an image, table, or plot
+                    self.main_table = ui.table(columns=None, rows=None,
+                                               row_key="Index")
+                    self.main_plot = ui.pyplot(figsize=self.fig_size,
+                                               close=False).classes("w-full")
 
-            # Sliders for adjust the contrast of an image.
-            with ui.row().classes(
-                    "w-full justify-between no-wrap items-center"):
-                ui.label("Min: ").style(FONT_STYLE)
-                self.min_slider = ui.slider(min=0, max=254, value=0).props(
-                    "label-always").on("update:model-value",
-                                       throttle=UPDATE_RATE,
-                                       leading_events=False)
+                    # Sliders for adjust the contrast of an image.
+                    with ui.row().classes(
+                            "w-full justify-between no-wrap items-center"):
+                        ui.label("Min: ").style(FONT_STYLE)
+                        self.min_slider = ui.slider(min=0, max=254,
+                                                    value=0).props(
+                            "label-always").on("update:model-value",
+                                               throttle=UPDATE_RATE,
+                                               leading_events=False)
 
-                ui.label("Max: ").style(FONT_STYLE)
-                self.max_slider = ui.slider(min=1, max=255, value=255).props(
-                    "label-always").on("update:model-value",
-                                       throttle=UPDATE_RATE,
-                                       leading_events=False)
-                self.reset_button = ui.button("Reset")
+                        ui.label("Max: ").style(FONT_STYLE)
+                        self.max_slider = ui.slider(min=1, max=255,
+                                                    value=255).props(
+                            "label-always").on("update:model-value",
+                                               throttle=UPDATE_RATE,
+                                               leading_events=False)
+                        self.reset_button = ui.button("Reset")
+                # Tab 2 for showing image information
+                with ui.tab_panel(self.tab_two):
+                    with ui.row().classes(
+                            "w-full justify-between no-wrap items-center"):
+                        self.histogram_plot = ui.pyplot(figsize=self.plot_size,
+                                                        close=False,
+                                                        ).classes("w-full")
+                        self.image_info_table = ui.table(columns=None,
+                                                         rows=None,
+                                                         row_key="name")
 
 
 class FilePicker(ui.dialog):
@@ -316,8 +354,8 @@ class FilePicker(ui.dialog):
 
     async def handle_ok(self):
         try:
-            rows = await ui.run_javascript(
-                f'getElement({self.grid.id}).gridOptions.api.getSelectedRows()')
+            self.update_grid()
+            rows = await self.grid.get_selected_rows()
             if rows:
                 fpath = [r['path'] for r in rows]
                 if fpath:
@@ -326,7 +364,7 @@ class FilePicker(ui.dialog):
                     ui.notify("No file path found in the selected rows")
                     return
             else:
-                ui.notify("No rows selected.")
+                ui.notify("No rows selected. Try double-click instead !!!")
                 return
         except Exception as e:
             ui.notify(f"An error occurred: {e}")

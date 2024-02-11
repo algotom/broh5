@@ -276,6 +276,37 @@ def format_table_from_array(data):
     return rows, columns
 
 
+def format_statistical_info(image):
+    """
+    Get statistical information of a 2d array and format the output as a
+    Nicegui table object.
+
+    Parameters
+    ----------
+    image : ndarray
+        NumPy array to format.
+
+    Returns
+    -------
+    tuple
+        A tuple containing the rows and columns formatted for the table.
+    """
+    data_type = image.dtype.name
+    min_val = np.min(image)
+    max_val = np.max(image)
+    mean_val = np.mean(image)
+    std_val = np.std(image)
+    columns = [{"name": "information", "label": "Information",
+                "field": "information"},
+               {"name": "value", "label": "Value", "field": "value"}]
+    rows = [{"name": "Minimum", "value": min_val},
+            {"name": "Maximum", "value": max_val},
+            {"name": "Mean", "value": mean_val},
+            {"name": "Standard deviation", "value": std_val},
+            {"name": "Data type", "value": data_type}]
+    return rows, columns
+
+
 def save_image(file_path, mat):
     """
     Save a 2D array as an image file.

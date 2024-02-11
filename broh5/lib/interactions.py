@@ -85,6 +85,15 @@ class GuiInteraction(GuiRendering):
         self.current_slice = None
         self.data_1d_2d = None
         self.timer = ui.timer(re.UPDATE_RATE, lambda: self.show_data())
+        self.tab_one.on("click", self.select_tab_one)
+        self.tab_two.on("click", self.select_tab_two)
+        self.selected_tab = 1
+
+    def select_tab_one(self):
+        self.selected_tab = 1
+
+    def select_tab_two(self):
+        self.selected_tab = 2
 
     def show_key(self, event: ValueChangeEventArguments, file_path):
         """
@@ -157,6 +166,8 @@ class GuiInteraction(GuiRendering):
         self.axis_list.enable()
         self.cmap_list.enable()
         self.save_image_button.enable()
+        self.histogram_plot.set_visibility(True)
+        self.image_info_table.set_visibility(True)
 
         # Disable other ui-components
         self.main_table.set_visibility(False)
@@ -178,11 +189,15 @@ class GuiInteraction(GuiRendering):
         self.axis_list.disable()
         self.cmap_list.disable()
         self.save_image_button.disable()
+        self.histogram_plot.set_visibility(False)
+        self.image_info_table.set_visibility(False)
 
         # Enable other ui-components
         self.display_type.enable()
         self.marker_list.enable()
         self.save_data_button.enable()
+        self.panel_tabs.set_value(self.tab_one)
+        self.selected_tab = 1
 
     def reset(self, keep_display=False):
         """Reset status of UI-elements"""
@@ -205,6 +220,10 @@ class GuiInteraction(GuiRendering):
         self.main_plot.set_visibility(True)
         self.save_image_button.disable()
         self.save_data_button.disable()
+        self.histogram_plot.set_visibility(False)
+        self.image_info_table.set_visibility(False)
+        self.panel_tabs.set_value(self.tab_one)
+        self.selected_tab = 1
 
     def reset_min_max(self):
         """Reset minimum and maximum values of sliders"""
@@ -261,11 +280,37 @@ class GuiInteraction(GuiRendering):
                 image1 = np.zeros(self.image.shape)
         else:
             image1 = np.copy(self.image)
+
         with self.main_plot:
             plt.clf()
+            plt.rcParams["font.family"] = "Arial"
             plt.imshow(image1, cmap=self.cmap_list.value)
             plt.tight_layout()
             self.main_plot.update()
+            plt.rcdefaults()
+
+        if self.selected_tab == 2:
+            rows = util.format_statistical_info(self.image)[0]
+            if self.image_info_table.rows is None:
+                self.image_info_table._props["rows"] = rows
+            else:
+                self.image_info_table.rows[:] = rows
+            self.image_info_table.update()
+            with self.histogram_plot:
+                plt.clf()
+                flat_data = np.ndarray.flatten(self.image)
+                num_bins = int(2 * (len(flat_data)) ** (1. / 3))
+                hist, bin_edges = np.histogram(flat_data, bins=num_bins)
+                plt.rcParams["font.family"] = "Arial"
+                plt.bar(bin_edges[:-1], hist, width=np.diff(bin_edges),
+                        edgecolor="black", align="edge", alpha=0.65,
+                        color="skyblue", label=f"Num bins: {num_bins}")
+                plt.title("Histogram")
+                plt.xlabel("Grayscale")
+                plt.ylabel("Frequency")
+                plt.legend()
+                self.histogram_plot.update()
+                plt.rcdefaults()
 
     def display_1d_2d_data(self, data_obj, disp_type="plot"):
         """Display 1d/2d array as a table or plot"""
@@ -300,19 +345,31 @@ class GuiInteraction(GuiRendering):
             if x is not None:
                 with self.main_plot:
                     plt.clf()
+                    plt.rcParams["font.family"] = "Arial"
                     title = self.hdf_key_display.text.split("/")[-1]
                     plt.title(title.capitalize())
                     plt.plot(x, y, marker=self.marker_list.value,
                              color=re.PLOT_COLOR)
                     plt.tight_layout()
                     self.main_plot.update()
+                    plt.rcdefaults()
             if img:
                 with self.main_plot:
                     plt.clf()
+                    plt.rcParams["font.family"] = "Arial"
                     plt.imshow(data_obj[:], cmap=self.cmap_list.value,
                                aspect="auto")
                     plt.tight_layout()
                     self.main_plot.update()
+                    plt.rcdefaults()
+
+    def __clear_plot(self):
+        with self.main_plot:
+            plt.clf()
+            self.main_plot.update()
+        with self.histogram_plot:
+            plt.clf()
+            self.histogram_plot.update()
 
     def show_data(self):
         """Display data getting from a hdf file"""
@@ -323,7 +380,7 @@ class GuiInteraction(GuiRendering):
                          self.hdf_value_display.text, self.axis_list.value,
                          self.cmap_list.value, self.display_type.value,
                          self.marker_list.value, self.min_slider.value,
-                         self.max_slider.value)
+                         self.max_slider.value, self.selected_tab)
             if new_state != self.current_state:
                 self.current_state = new_state
                 try:
@@ -332,9 +389,7 @@ class GuiInteraction(GuiRendering):
                     if (data_type == "string" or data_type == "number"
                             or data_type == "boolean"):
                         self.hdf_value_display.set_text(str(value))
-                        with self.main_plot:
-                            plt.clf()
-                            self.main_plot.update()
+                        self.__clear_plot()
                         self.reset(keep_display=True)
                     elif data_type == "array":
                         self.hdf_value_display.set_text("Array shape: "
@@ -349,16 +404,12 @@ class GuiInteraction(GuiRendering):
                                 disp_type=self.display_type.value)
                         else:
                             ui.notify("Can't display {}-d array!".format(dim))
-                            with self.main_plot:
-                                plt.clf()
-                                self.main_plot.update()
+                            self.__clear_plot()
                             self.reset(keep_display=True)
                         hdf_obj.close()
                     else:
                         self.hdf_value_display.set_text(data_type)
-                        with self.main_plot:
-                            plt.clf()
-                            self.main_plot.update()
+                        self.__clear_plot()
                         self.reset(keep_display=True)
                 except Exception as error:
                     self.reset(keep_display=True)
@@ -378,9 +429,7 @@ class GuiInteraction(GuiRendering):
                                       "deleted, or corrupted) !!!")
         else:
             self.hdf_value_display.set_text("")
-            with self.main_plot:
-                plt.clf()
-                self.main_plot.update()
+            self.__clear_plot()
             self.reset(keep_display=True)
 
     async def save_image(self) -> None:
