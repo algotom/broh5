@@ -22,7 +22,9 @@ Features
   datasets as values, images, plots, or tables. Users also can save datasets 
   to images or csv formats.
 
-  ![Fig_01](https://github.com/nghia-vo/broh5/raw/main/figs/fig_01.png)
+  ![Fig_01](https://github.com/algotom/broh5/raw/main/figs/fig_01.png)
+
+  ![Fig_02](https://github.com/algotom/broh5/raw/main/figs/fig_02.png)
 
 - Broh5 can view compressed hdf files by using compressors from
   [hdf5plugin](https://pypi.org/project/hdf5plugin/).
