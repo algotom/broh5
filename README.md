@@ -5,11 +5,11 @@ Web browser-based GUI software is increasingly popular for its cross-platform
 compatibility, but typically requires web programming knowledge. 
 
 The [Nicegui](https://nicegui.io/) framework simplifies this, enabling pure 
-Python development of browser-based GUIs. This project leverages Nicegui to 
-create an HDF viewer, showcasing its effectiveness for local app development. 
-Unlike other HDF/H5/NXS file viewers like hdfviewer, vitables, nexpy, or h5web, 
+Python development of browser-based GUIs. This project uses Nicegui to create 
+an HDF viewer, showcasing its effectiveness for local app development. 
+Unlike other apps such as Hdfviewer, Vitables, Nexpy, or H5web, 
 which are built using C, Java, Qt/PyQt, or HTML/JavaScript; this project is 
-unique in being a web browser-based HDF viewer written entirely in Python 
+unique in being a browser-based GUI, but written entirely in Python 
 with a minimal codebase.
 
 Features
@@ -40,8 +40,9 @@ Installation
 
 Broh5 can be installed using [pip](https://pypi.org/project/broh5/),
 [conda](https://anaconda.org/conda-forge/broh5), or directly from the
-[source](https://github.com/algotom/broh5). Users can also generate a
-standalone executable file for convenient usage. Details are at:
+[source](https://broh5.readthedocs.io/en/latest/toc/installation.html#installing-from-source). 
+Users can also generate a [standalone executable file](https://broh5.readthedocs.io/en/latest/toc/installation.html#generating-a-standalone-executable-file) 
+for convenient usage. Details are at:
 
   - https://broh5.readthedocs.io/en/latest/toc/installation.html
 
@@ -62,7 +63,12 @@ Documentation page is at: https://broh5.readthedocs.io. Brief functionalities of
     due to processing time.
   - Datasets that are 1D or 2D arrays will be shown as plots or tables, selectively.
   - Users have the option to save images or tables to disk.
- 
+
+Update notes
+------------
+- 30/10/2023: Publish codes, deploy on pip and conda.
+- 11/02/2024: Add tab for displaying image histogram and statistical information.
+- 30/04/2024: Allow to open/save from the last opened folder.
  
 Author
 ------

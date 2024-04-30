@@ -119,6 +119,8 @@ autodoc_mock_imports = [
     'matplotlib',
     'nicegui',
     'PIL',
+    'hdf5plugin',
+
 ]
 
 # autoapi_dirs = ['../..']

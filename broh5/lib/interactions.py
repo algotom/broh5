@@ -299,11 +299,9 @@ class GuiInteraction(GuiRendering):
 
         with self.main_plot:
             plt.clf()
-            plt.rcParams["font.family"] = "Arial"
             plt.imshow(image1, cmap=self.cmap_list.value)
             plt.tight_layout()
             self.main_plot.update()
-            plt.rcdefaults()
 
         if self.selected_tab == 2:
             rows = util.format_statistical_info(self.image)[0]
@@ -312,7 +310,6 @@ class GuiInteraction(GuiRendering):
             else:
                 self.image_info_table.rows[:] = rows
             self.image_info_table.update()
-            plt.rcParams["font.family"] = "Arial"
             with self.histogram_plot:
                 plt.clf()
                 flat_data = self.image.ravel()
@@ -326,7 +323,6 @@ class GuiInteraction(GuiRendering):
                 plt.ylabel("Frequency")
                 plt.legend()
                 self.histogram_plot.update()
-            plt.rcdefaults()
 
     def display_1d_2d_data(self, data_obj, disp_type="plot"):
         """Display 1d/2d array as a table or plot"""
