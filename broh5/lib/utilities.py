@@ -376,6 +376,9 @@ def save_table(file_path, data):
 
 
 def get_config_path():
+    """
+    Get path to save a config file depending on the OS system.
+    """
     home = os.path.expanduser("~")
     if platform.system() == "Windows":
         return os.path.join(home, 'AppData', 'Roaming', 'Broh5',
@@ -388,6 +391,9 @@ def get_config_path():
 
 
 def save_config(data):
+    """
+    Save data (dictionary) to the config file (json format).
+    """
     config_path = get_config_path()
     os.makedirs(os.path.dirname(config_path), exist_ok=True)
     with open(config_path, 'w') as f:
@@ -395,6 +401,9 @@ def save_config(data):
 
 
 def load_config():
+    """
+    Load the config file.
+    """
     config_path = get_config_path()
     try:
         with open(config_path, 'r') as f:

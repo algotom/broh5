@@ -18,3 +18,6 @@
         format_table_from_array
         save_image
         save_table
+        get_config_path
+        save_config
+        load_config
