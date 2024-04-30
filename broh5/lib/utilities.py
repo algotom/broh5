@@ -262,6 +262,9 @@ def format_table_from_array(data):
     if len(data.shape) == 1:
         data = np.expand_dims(np.asarray(data), 1)
     (height, width) = data.shape[:2]
+    if width > height:
+        data = np.transpose(data)
+        (height, width) = data.shape[:2]
     if height > 1000 and width > 1000:
         rows, columns = None, None
     else:
