@@ -296,21 +296,21 @@ class GuiInteraction(GuiRendering):
             else:
                 self.image_info_table.rows[:] = rows
             self.image_info_table.update()
+            plt.rcParams["font.family"] = "Arial"
             with self.histogram_plot:
                 plt.clf()
-                flat_data = np.ndarray.flatten(self.image)
-                num_bins = int(2 * (len(flat_data)) ** (1. / 3))
+                flat_data = self.image.ravel()
+                num_bins = min(255, len(flat_data))
                 hist, bin_edges = np.histogram(flat_data, bins=num_bins)
-                plt.rcParams["font.family"] = "Arial"
-                plt.bar(bin_edges[:-1], hist, width=np.diff(bin_edges),
-                        edgecolor="black", align="edge", alpha=0.65,
-                        color="skyblue", label=f"Num bins: {num_bins}")
+                plt.hist(bin_edges[:-1], bins=bin_edges, weights=hist,
+                         color='skyblue', edgecolor='black', alpha=0.65,
+                         label=f"Num bins: {num_bins}")
                 plt.title("Histogram")
                 plt.xlabel("Grayscale")
                 plt.ylabel("Frequency")
                 plt.legend()
                 self.histogram_plot.update()
-                plt.rcdefaults()
+            plt.rcdefaults()
 
     def display_1d_2d_data(self, data_obj, disp_type="plot"):
         """Display 1d/2d array as a table or plot"""
