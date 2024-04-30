@@ -88,6 +88,7 @@ class GuiInteraction(GuiRendering):
         self.tab_one.on("click", self.select_tab_one)
         self.tab_two.on("click", self.select_tab_two)
         self.selected_tab = 1
+        self.last_folder = ""
 
     def select_tab_one(self):
         self.selected_tab = 1
@@ -110,9 +111,24 @@ class GuiInteraction(GuiRendering):
 
     async def pick_file(self) -> None:
         """To pick a file when click the button 'Select file' """
-        file_path = await FilePicker("~",
-                                     allowed_extensions=re.INPUT_EXT)
+        config_data = util.load_config()
+        if config_data is None:
+            self.last_folder = ""
+        else:
+            try:
+                self.last_folder = config_data["last_folder"]
+            except KeyError:
+                self.last_folder = ""
+        if (self.last_folder == "") or (not os.path.exists(self.last_folder)):
+            file_path = await FilePicker("~",
+                                         allowed_extensions=re.INPUT_EXT)
+        else:
+            file_path = await FilePicker(self.last_folder,
+                                         allowed_extensions=re.INPUT_EXT)
         if file_path:
+            self.last_folder = os.path.dirname(file_path)
+            config_data = {'last_folder': self.last_folder}
+            util.save_config(config_data)
             self.display_hdf_tree(file_path)
 
     def display_hdf_tree(self, file_path):
@@ -434,8 +450,13 @@ class GuiInteraction(GuiRendering):
 
     async def save_image(self) -> None:
         """To save a slice to file when click 'Save image' """
-        file_path = await FileSaver("~", title="File name (ext: .tif, "
-                                               ".jpg, .png, or .csv)")
+        if (self.last_folder == "") or (not os.path.exists(self.last_folder)):
+            file_path = await FileSaver("~", title="File name (ext: .tif, "
+                                                   ".jpg, .png, or .csv)")
+        else:
+            file_path = await FileSaver(self.last_folder,
+                                        title="File name (ext: .tif, "
+                                              ".jpg, .png, or .csv)")
         if file_path and self.image is not None:
             file_ext = os.path.splitext(file_path)[-1]
             if (file_ext != ".tif" and file_ext != ".jpg"
@@ -459,7 +480,11 @@ class GuiInteraction(GuiRendering):
 
     async def save_data(self) -> None:
         """To save data to file when click the button 'Save data' """
-        file_path = await FileSaver("~", title="File name (ext: .csv)")
+        if (self.last_folder == "") or (not os.path.exists(self.last_folder)):
+            file_path = await FileSaver("~", title="File name (ext: .csv)")
+        else:
+            file_path = await FileSaver(self.last_folder,
+                                        title="File name (ext: .csv)")
         if file_path and self.data_1d_2d is not None:
             file_ext = os.path.splitext(file_path)[-1]
             if file_ext == "":

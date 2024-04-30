@@ -311,8 +311,12 @@ class FilePicker(ui.dialog):
         if platform.system() == 'Windows':
             drives = ['%s:\\' % d for d in string.ascii_uppercase if
                       os.path.exists('%s:' % d)]
-            self.path = Path(drives[0]).expanduser()
-            self.drives_toggle = ui.toggle(drives, value=drives[0],
+            if self.path != "" or self.path != ".":
+                select_drive = os.path.splitdrive(self.path)[0] + "\\"
+            else:
+                self.path = Path(drives[0]).expanduser()
+                select_drive = drives[0]
+            self.drives_toggle = ui.toggle(drives, value=select_drive,
                                            on_change=self.__update_drive)
 
     def __update_drive(self):
@@ -439,8 +443,12 @@ class FileSaver(ui.dialog):
         if platform.system() == 'Windows':
             drives = ['%s:\\' % d for d in string.ascii_uppercase if
                       os.path.exists('%s:' % d)]
-            self.path = Path(drives[0]).expanduser()
-            self.drives_toggle = ui.toggle(drives, value=drives[0],
+            if self.path != "" or self.path != ".":
+                select_drive = os.path.splitdrive(self.path)[0] + "\\"
+            else:
+                self.path = Path(drives[0]).expanduser()
+                select_drive = drives[0]
+            self.drives_toggle = ui.toggle(drives, value=select_drive,
                                            on_change=self.__update_drive)
 
     def __update_drive(self):

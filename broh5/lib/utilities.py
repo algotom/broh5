@@ -7,9 +7,12 @@ Module for utility methods:
     -   Convert 1d/2d array to a table format.
     -   Save 2d array to an image.
     -   Save 1d/2d array to a csv file.
+    -   Save/get path of the last opened folder
 """
 
 import os
+import json
+import platform
 import csv
 import tkinter as tk
 import h5py
@@ -370,3 +373,31 @@ def save_table(file_path, data):
                 return "Data must be a 1D or 2D array"
     except Exception as error:
         return str(error)
+
+
+def get_config_path():
+    home = os.path.expanduser("~")
+    if platform.system() == "Windows":
+        return os.path.join(home, 'AppData', 'Roaming', 'Broh5',
+                            'broh5_config.json')
+    elif platform.system() == "Darwin":
+        return os.path.join(home, 'Library', 'Application Support', 'Broh5',
+                            'broh5_config.json')
+    else:
+        return os.path.join(home, '.broh5', 'broh5_config.json')
+
+
+def save_config(data):
+    config_path = get_config_path()
+    os.makedirs(os.path.dirname(config_path), exist_ok=True)
+    with open(config_path, 'w') as f:
+        json.dump(data, f)
+
+
+def load_config():
+    config_path = get_config_path()
+    try:
+        with open(config_path, 'r') as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return None
