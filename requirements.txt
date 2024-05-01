@@ -4,4 +4,4 @@ h5py>3.7
 hdf5plugin
 pillow
 matplotlib
-nicegui>1.3.16
+nicegui>1.4.5
