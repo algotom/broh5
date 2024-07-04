@@ -25,7 +25,6 @@ AXIS_LIST = [0, 1, 2]
 FONT_STYLE = "font-size: 105%; font-weight: bold"
 DISPLAY_TYPE = ["plot", "table"]
 UPDATE_RATE = 0.2  # second
-DPI = 96
 RATIO = 0.65  # Ratio for adjusting size between image/plot and screen
 MAX_FIG_SIZE = [12.0, 9.0]
 MAX_PLOT_SIZE = [9.0, 7.0]
@@ -35,6 +34,8 @@ HEADER_COLOR = "#3874c8"
 HEADER_TITLE = "BROWSER-BASED HDF VIEWER"
 LEFT_DRAWER_COLOR = "#d7e3f4"
 TREE_BGR_COLOR = "#f8f8ff"
+BOX_LINE_COLOR = "lime"
+BOX_LINE_WIDTH = 3
 
 
 class GuiRendering:
@@ -64,6 +65,14 @@ class GuiRendering:
         Dropdown to select axis for slicing.
     cmap_list : UI select
         Dropdown to select color map for plots.
+    enable_zoom : UI checkbox
+        Check-box to enable/disable image zoom.
+    zoom_list : UI select
+        Dropdown to select zooming ratio.
+    enable_profile :  UI checkbox
+        Check-box to enable/disable the intensity-profile plot
+    profile_list : UI select
+        Dropdown to select the direction of the intensity profile.
     save_image_button : UI button
         Button to save current image.
     display_type : UI select
@@ -76,8 +85,10 @@ class GuiRendering:
         Slider to navigate through slices of 3D data.
     main_table : UI table
         Table to display data in tabular form.
-    main_plot : UI pyplot
-        Pyplot element to display plots.
+    main_plot : UI matplotlib
+        Matplotlib element to display plots.
+    zoom_profile_plot : UI pyplot
+        Pyplot element to display zooming of an image or intensity-profile.
     min_slider : UI slider
         Slider to adjust the minimum value for image contrast.
     max_slider : UI slider
@@ -97,9 +108,10 @@ class GuiRendering:
     def __init__(self):
         super().__init__()
         # Initial parameters
-        (sc_height, sc_width) = util.get_height_width_screen()
-        hei_size = RATIO * sc_width / DPI
-        wid_size = RATIO * sc_height / DPI
+        (sc_height, sc_width, dpi) = util.get_height_width_screen()
+        hei_size = RATIO * sc_width / dpi
+        wid_size = RATIO * sc_height / dpi
+        self.dpi = dpi
         self.fig_size = (min(hei_size, MAX_FIG_SIZE[0]),
                          min(wid_size, MAX_FIG_SIZE[1]))
         self.plot_size = (min(hei_size, MAX_PLOT_SIZE[0]),
@@ -111,6 +123,10 @@ class GuiRendering:
         self.hdf_value_display = None
         self.axis_list = None
         self.cmap_list = None
+        self.enable_zoom = None
+        self.zoom_list = None
+        self.enable_profile = None
+        self.profile_list = None
         self.save_image_button = None
         self.display_type = None
         self.marker_list = None
@@ -118,6 +134,7 @@ class GuiRendering:
         self.main_slider = None
         self.main_table = None
         self.main_plot = None
+        self.zoom_profile_plot = None
         self.min_slider = None
         self.max_slider = None
         self.reset_button = None
@@ -173,6 +190,12 @@ class GuiRendering:
                 with ui.row().classes("items-center"):
                     ui.label("Color map: ").style(FONT_STYLE)
                     self.cmap_list = ui.select(CMAP_LIST, value=CMAP_LIST[0])
+                with ui.row().classes("items-center"):
+                    self.enable_zoom = ui.checkbox('Zoom')
+                    self.zoom_list = ui.select(['2x', '4x', '8x'], value="2x")
+                    self.enable_profile = ui.checkbox('Profile')
+                    self.profile_list = ui.select(['vertical', 'horizontal'],
+                                                  value='horizontal')
                 self.save_image_button = ui.button("Save image")
 
                 # For ui-components used to interact with 1d/2d data.
@@ -209,8 +232,12 @@ class GuiRendering:
                     # For display data as an image, table, or plot
                     self.main_table = ui.table(columns=None, rows=None,
                                                row_key="Index")
-                    self.main_plot = ui.pyplot(figsize=self.fig_size,
-                                               close=False).classes("w-full")
+                    with ui.row().classes("w-full justify-left no-wrap "
+                                          "items-center"):
+                        self.main_plot = ui.matplotlib(figsize=self.fig_size,
+                                                       dpi=self.dpi)
+                        self.zoom_profile_plot = ui.pyplot(
+                            figsize=self.fig_size, close=False)
 
                     # Sliders for adjust the contrast of an image.
                     with ui.row().classes(
@@ -351,9 +378,11 @@ class FilePicker(ui.dialog):
         if self.path.is_dir():
             self.update_grid()
         else:
-            if self.path:
+            if self.path and self.path.suffix in {'.h5', '.hdf', '.nxs'}:
                 self.submit(str(self.path))
             else:
+                ui.notify("Please select a file with the extension .h5, "
+                          ".hdf, or .nxs!")
                 return
 
     async def handle_ok(self):
@@ -363,12 +392,18 @@ class FilePicker(ui.dialog):
             if rows:
                 fpath = [r['path'] for r in rows]
                 if fpath:
-                    self.submit(fpath[0])
+                    selected_path = Path(fpath[0])
+                    if selected_path.suffix in {'.h5', '.hdf', '.nxs'}:
+                        self.submit(str(selected_path))
+                    else:
+                        ui.notify("Please select a file with the extension "
+                                  ".h5, .hdf, or .nxs!")
+                        return
                 else:
                     ui.notify("No file path found in the selected rows")
                     return
             else:
-                ui.notify("No rows selected. Try double-click instead !!!")
+                ui.notify("No rows selected. Try double-clicking instead!")
                 return
         except Exception as e:
             ui.notify(f"An error occurred: {e}")

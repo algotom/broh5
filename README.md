@@ -23,7 +23,11 @@ Features
   to images or csv formats.
 
   ![Fig_01](https://github.com/algotom/broh5/raw/main/figs/fig_01.png)
+  
+  ![Fig 04](./figs/fig_04.png)
 
+  ![Fig 05](./figs/fig_05.png)
+    
   ![Fig_02](https://github.com/algotom/broh5/raw/main/figs/fig_02.png)
 
 - Broh5 can view compressed hdf files by using compressors from
@@ -31,8 +35,7 @@ Features
 
 - The codebase is designed using the RUI (Rendering-Utilities-Interactions) 
   concept, which is known as the MVC (Model-View-Controller) pattern in the 
-  GUI development community. The name 'MVC' may not be very intuitive for 
-  those new to GUI development. However, this design allows for the development 
+  GUI development community. This design allows for the development 
   of complex software and makes it easier to extend its capabilities.
 
 Installation
@@ -61,14 +64,18 @@ Documentation page is at: https://broh5.readthedocs.io. Brief functionalities of
     through various images and adjust the contrast. Slicing is available for 
     different axes; however, for large datasets, slicing along axis 2 is disabled 
     due to processing time.
+    - Starting from version 1.3.0, users can choose to display a zoomed area of 
+      the current image or the intensity profile across a mouse-clicked location.
+        
   - Datasets that are 1D or 2D arrays will be shown as plots or tables, selectively.
   - Users have the option to save images or tables to disk.
 
 Update notes
 ------------
-- 30/10/2023: Publish codes, deploy on pip and conda.
-- 11/02/2024: Add tab for displaying image histogram and statistical information.
+- 30/10/2023: Published codes, deployed on pip and conda.
+- 11/02/2024: Added tab for displaying image histogram and statistical information.
 - 30/04/2024: Allow to open/save from the last opened folder.
+- 04/07/2024: Added features for image zooming and intensity profile plotting
  
 Author
 ------

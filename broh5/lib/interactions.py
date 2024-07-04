@@ -7,8 +7,9 @@ import h5py
 import hdf5plugin
 import numpy as np
 import matplotlib.pyplot as plt
-from nicegui import ui
-from nicegui.events import ValueChangeEventArguments
+import matplotlib.patches as patches
+from matplotlib.lines import Line2D
+from nicegui import ui, events
 import broh5.lib.rendering as re
 import broh5.lib.utilities as util
 from broh5.lib.rendering import GuiRendering, FilePicker, FileSaver
@@ -42,6 +43,8 @@ class GuiInteraction(GuiRendering):
 
     Methods
     -------
+    mouse_handler(MouseEventArguments)
+        Display the image ROI or intensity profile when clicking on the image.
     show_key(ValueChangeEventArguments, str)
         Display the key of the HDF dataset/group when a tree node is clicked.
     pick_file()
@@ -78,25 +81,110 @@ class GuiInteraction(GuiRendering):
         self.save_image_button.on("click", self.save_image)
         self.save_data_button.on("click", self.save_data)
         self.reset_button.on("click", self.reset_min_max)
-        self.current_state = None
-        self.columns = None
-        self.rows = None
-        self.image = None
-        self.current_slice = None
-        self.data_1d_2d = None
+        self.enable_zoom.on("click", self.__update_zoom_check_box)
+        self.enable_profile.on("click", self.__update_profile_check_box)
+        self.main_plot.on("click", self.mouse_handler)
+        self.tab_one.on("click", self.__select_tab_one)
+        self.tab_two.on("click", self.__select_tab_two)
+        self.current_state, self.image, self.image_norm = None, None, None
+        self.columns, self.rows = None, None
+        self.current_slice, self.data_1d_2d = None, None
         self.timer = ui.timer(re.UPDATE_RATE, lambda: self.show_data())
-        self.tab_one.on("click", self.select_tab_one)
-        self.tab_two.on("click", self.select_tab_two)
         self.selected_tab = 1
         self.last_folder = ""
+        self.fig, self.ax = None, None
+        self.ver_line, self.hor_line, self.draw_roi = None, None, None
 
-    def select_tab_one(self):
+    def __select_tab_one(self):
         self.selected_tab = 1
 
-    def select_tab_two(self):
+    def __select_tab_two(self):
         self.selected_tab = 2
 
-    def show_key(self, event: ValueChangeEventArguments, file_path):
+    def __update_zoom_check_box(self):
+        if (self.enable_zoom.value is True
+                and self.enable_profile.value is True):
+            self.enable_profile.set_value(False)
+
+    def __update_profile_check_box(self):
+        if (self.enable_profile.value is True
+                and self.enable_zoom.value is True):
+            self.enable_zoom.set_value(False)
+
+    def __get_xy(self, x, y, ax):
+        try:
+            xn, yn = ax.transData.inverted().transform((x, y))
+            return xn, yn
+        except Exception as e:
+            return None, None
+
+    def mouse_handler(self, e: events.MouseEventArguments):
+        """
+        Show the zoomed area around the mouse-clicked location or the
+        intensity profile across the clicked location.
+        """
+        if self.image is not None and (
+                self.enable_profile.value or self.enable_zoom.value):
+            x, y = self.__get_xy(e.args['offsetX'], e.args['offsetY'], self.ax)
+            if x is not None:
+                (height, width) = self.image.shape
+                x = int(x)
+                y_max = self.ax.transData.inverted().transform(
+                    (0, self.ax.get_ylim()[-1]))[-1]
+                y = height - 1 - int(y) + int((y_max - height) / 2)
+                if width > x >= 0 and height > y >= 0:
+                    with self.zoom_profile_plot:
+                        plt.clf()
+                        if self.draw_roi is not None:
+                            self.draw_roi.remove()
+                        if self.ver_line is not None:
+                            self.ver_line.remove()
+                        if self.hor_line is not None:
+                            self.hor_line.remove()
+                        self.hor_line, self.ver_line = None, None
+                        self.draw_roi = None
+                        if self.enable_profile.value:
+                            if self.profile_list.value == "vertical":
+                                self.ver_line = Line2D([x, x],
+                                                       [-1, height + 1],
+                                                       color=re.BOX_LINE_COLOR,
+                                                       linewidth=\
+                                                           re.BOX_LINE_WIDTH)
+                                if self.ax is not None:
+                                    self.ax.add_line(self.ver_line)
+                                    list_data = self.image[:, x]
+                                    plt.plot(list_data)
+                                    plt.title(f"Profile at column: {x}")
+                            else:
+                                self.hor_line = Line2D([-1, width + 1], [y, y],
+                                                       color=re.BOX_LINE_COLOR,
+                                                       linewidth=\
+                                                           re.BOX_LINE_WIDTH)
+                                if self.ax is not None:
+                                    self.ax.add_line(self.hor_line)
+                                    list_data = self.image[y]
+                                    plt.plot(list_data)
+                                    plt.title(f"Profile at row: {y}")
+                            plt.xlabel("Index")
+                            plt.ylabel("Intensity")
+                            plt.tight_layout()
+                            self.main_plot.update()
+                        else:
+                            val = self.zoom_list.value
+                            zoom = int(val.replace("x", ""))
+                            roi_img, x0, y0, size = \
+                                util.get_image_roi(x, y, self.image_norm,
+                                                   zoom=zoom)
+                            self.draw_roi = patches.Rectangle((x0, y0), size,
+                                size, linewidth=re.BOX_LINE_WIDTH,
+                                edgecolor=re.BOX_LINE_COLOR, facecolor='none')
+                            self.ax.add_patch(self.draw_roi)
+                            self.main_plot.update()
+                            plt.imshow(roi_img, cmap=self.cmap_list.value)
+                            plt.tight_layout()
+                        self.zoom_profile_plot.update()
+
+    def show_key(self, event: events.ValueChangeEventArguments, file_path):
         """
         Show key to a dataset/group of a hdf file when users click
         to a branch of the hdf tree.
@@ -181,9 +269,17 @@ class GuiInteraction(GuiRendering):
         self.main_plot.set_visibility(True)
         self.axis_list.enable()
         self.cmap_list.enable()
+        self.enable_zoom.enable()
+        self.zoom_list.enable()
+        self.enable_profile.enable()
+        self.profile_list.enable()
         self.save_image_button.enable()
         self.histogram_plot.set_visibility(True)
         self.image_info_table.set_visibility(True)
+        if self.enable_profile.value or self.enable_zoom.value:
+            self.zoom_profile_plot.set_visibility(True)
+        else:
+            self.zoom_profile_plot.set_visibility(False)
 
         # Disable other ui-components
         self.main_table.set_visibility(False)
@@ -197,16 +293,21 @@ class GuiInteraction(GuiRendering):
         Enable UI-elements for displaying 1d/2d data as a table or plot, and
         disable non-related UI-elements.
         """
-        self.image = None
+        self.image, self.image_norm = None, None
         # Disable ui-components related to image show
         self.disable_sliders()
         self.axis_list.value = re.AXIS_LIST[0]
         self.cmap_list.value = re.CMAP_LIST[0]
         self.axis_list.disable()
         self.cmap_list.disable()
+        self.enable_zoom.disable()
+        self.zoom_list.disable()
+        self.enable_profile.disable()
+        self.profile_list.disable()
         self.save_image_button.disable()
         self.histogram_plot.set_visibility(False)
         self.image_info_table.set_visibility(False)
+        self.zoom_profile_plot.set_visibility(False)
 
         # Enable other ui-components
         self.display_type.enable()
@@ -229,15 +330,23 @@ class GuiInteraction(GuiRendering):
         self.cmap_list.disable()
         self.display_type.disable()
         self.marker_list.disable()
+        self.enable_zoom.set_value(False)
+        self.enable_zoom.disable()
+        self.zoom_list.disable()
+        self.enable_profile.set_value(False)
+        self.enable_profile.disable()
+        self.profile_list.disable()
         self.disable_sliders()
         self.rows, self.columns = None, None
-        self.image, self.data_1d_2d = None, None
+        self.image, self.image_norm, self.data_1d_2d = None, None, None
         self.main_table.set_visibility(False)
         self.main_plot.set_visibility(True)
+        self.zoom_profile_plot.set_visibility(False)
         self.save_image_button.disable()
         self.save_data_button.disable()
         self.histogram_plot.set_visibility(False)
         self.image_info_table.set_visibility(False)
+        self.zoom_profile_plot.set_visibility(False)
         self.panel_tabs.set_value(self.tab_one)
         self.selected_tab = 1
 
@@ -270,7 +379,7 @@ class GuiInteraction(GuiRendering):
             self.current_slice = new_slice
             if int(self.axis_list.value) == 2:
                 if depth > 1000 and height > 1000:
-                    ui.notify("Slicing along axis 2 is very time consuming!")
+                    ui.notify("Slicing along axis 2 is very time-consuming!")
                     self.axis_list.value = 0
                     self.main_slider.set_value(0)
                     self.image = data_obj[0]
@@ -290,18 +399,21 @@ class GuiInteraction(GuiRendering):
                 self.min_slider.set_value(min_val)
             nmin, nmax = np.min(self.image), np.max(self.image)
             if nmax != nmin:
-                image1 = np.uint8(255.0 * (self.image - nmin) / (nmax - nmin))
-                image1 = np.clip(image1, min_val, max_val)
+                self.image_norm = np.uint8(
+                    255.0 * (self.image - nmin) / (nmax - nmin))
+                self.image_norm = np.clip(self.image_norm, min_val, max_val)
             else:
-                image1 = np.zeros(self.image.shape)
+                self.image_norm = np.zeros(self.image.shape)
         else:
-            image1 = np.copy(self.image)
+            self.image_norm = np.copy(self.image)
 
-        with self.main_plot:
-            plt.clf()
-            plt.imshow(image1, cmap=self.cmap_list.value)
-            plt.tight_layout()
-            self.main_plot.update()
+        self.fig = self.main_plot.figure
+        self.fig.clf()
+        self.fig.set_dpi(self.dpi)
+        self.ax = self.fig.gca()
+        self.ax.imshow(self.image_norm, cmap=self.cmap_list.value)
+        self.fig.tight_layout()
+        self.main_plot.update()
 
         if self.selected_tab == 2:
             rows = util.format_statistical_info(self.image)[0]
@@ -355,30 +467,32 @@ class GuiInteraction(GuiRendering):
                 size = len(data_obj)
                 x, y = np.arange(size), np.asarray(data_obj[:])
             if x is not None:
-                with self.main_plot:
-                    plt.clf()
-                    plt.rcParams["font.family"] = "Arial"
-                    title = self.hdf_key_display.text.split("/")[-1]
-                    plt.title(title.capitalize())
-                    plt.plot(x, y, marker=self.marker_list.value,
-                             color=re.PLOT_COLOR)
-                    plt.tight_layout()
-                    self.main_plot.update()
-                    plt.rcdefaults()
+                title = self.hdf_key_display.text.split("/")[-1]
+                fig = self.main_plot.figure
+                fig.clf()
+                fig.set_dpi(self.dpi)
+                ax = fig.gca()
+                ax.set_title(title.capitalize())
+                ax.plot(x, y, marker=self.marker_list.value,
+                        color=re.PLOT_COLOR)
+                fig.tight_layout()
+                self.main_plot.update()
             if img:
-                with self.main_plot:
-                    plt.clf()
-                    plt.rcParams["font.family"] = "Arial"
-                    plt.imshow(data_obj[:], cmap=self.cmap_list.value,
-                               aspect="auto")
-                    plt.tight_layout()
-                    self.main_plot.update()
-                    plt.rcdefaults()
+                fig = self.main_plot.figure
+                fig.clf()
+                fig.set_dpi(self.dpi)
+                ax = fig.gca()
+                ax.imshow(data_obj[:], cmap=self.cmap_list.value,
+                          aspect="auto")
+                fig.tight_layout()
+                self.main_plot.update()
 
     def __clear_plot(self):
-        with self.main_plot:
+        self.main_plot.figure.clf()
+        self.main_plot.update()
+        with self.zoom_profile_plot:
             plt.clf()
-            self.main_plot.update()
+            self.zoom_profile_plot.update()
         with self.histogram_plot:
             plt.clf()
             self.histogram_plot.update()
@@ -392,7 +506,8 @@ class GuiInteraction(GuiRendering):
                          self.hdf_value_display.text, self.axis_list.value,
                          self.cmap_list.value, self.display_type.value,
                          self.marker_list.value, self.min_slider.value,
-                         self.max_slider.value, self.selected_tab)
+                         self.max_slider.value, self.selected_tab,
+                         self.enable_zoom.value, self.enable_profile.value)
             if new_state != self.current_state:
                 self.current_state = new_state
                 try:
