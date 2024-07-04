@@ -30,9 +30,25 @@ Features
     `hdf5plugin <https://pypi.org/project/hdf5plugin/>`__.
 -   The codebase is designed using the RUI (Rendering-Utilities-Interactions)
     concept, which is known as the MVC (Model-View-Controller) pattern in the
-    GUI development community. The name 'MVC' may not be very intuitive for
-    those new to GUI development. However, this design allows for the development
+    GUI development community. This design allows for the development
     of complex software and makes it easier to extend its capabilities.
+
+Usage
+=====
+
+-   Users can open a hdf file by clicking the "Select file" button. Multiple hdf
+    files can be opened sequentially.
+-   Upon opening, the tree structure of the current hdf file is displayed, allowing
+    users to navigate different branches (hdf groups) or leaves (hdf datasets).
+    The path to datasets/groups is also displayed. If a dataset contains a string
+    or a single float/integer value, it will be shown.
+-   If dataset is a 3D array, it's presented as an image. Users can slice
+    through various images and adjust the contrast. Slicing is available for
+    different axes; however, for large datasets, slicing along axis 2 is disabled
+    due to processing time. Starting from version 1.3.0, users can choose to display a zoomed area of
+    the current image or the intensity profile across a mouse-clicked location.
+-   Datasets that are 1D or 2D arrays will be shown as plots or tables, selectively.
+-   Users have the option to save images or tables to disk.
 
 Video demonstration:
 

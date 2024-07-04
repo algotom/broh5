@@ -24,9 +24,9 @@ Features
 
   ![Fig_01](https://github.com/algotom/broh5/raw/main/figs/fig_01.png)
   
-  ![Fig 04](./figs/fig_04.png)
+  ![Fig 04](https://github.com/algotom/broh5/raw/main/figs/fig_04.png)
 
-  ![Fig 05](./figs/fig_05.png)
+  ![Fig 05](https://github.com/algotom/broh5/raw/main/figs/fig_05.png)
     
   ![Fig_02](https://github.com/algotom/broh5/raw/main/figs/fig_02.png)
 
