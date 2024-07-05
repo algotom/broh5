@@ -170,18 +170,21 @@ class GuiInteraction(GuiRendering):
                             plt.tight_layout()
                             self.main_plot.update()
                         else:
-                            val = self.zoom_list.value
-                            zoom = int(val.replace("x", ""))
-                            roi_img, x0, y0, size = \
-                                util.get_image_roi(x, y, self.image_norm,
-                                                   zoom=zoom)
-                            self.draw_roi = patches.Rectangle((x0, y0), size,
-                                size, linewidth=re.BOX_LINE_WIDTH,
-                                edgecolor=re.BOX_LINE_COLOR, facecolor='none')
-                            self.ax.add_patch(self.draw_roi)
-                            self.main_plot.update()
-                            plt.imshow(roi_img, cmap=self.cmap_list.value)
-                            plt.tight_layout()
+                            if self.image_norm is not None:
+                                val = self.zoom_list.value
+                                zoom = int(val.replace("x", ""))
+                                roi_img, x0, y0, size = \
+                                    util.get_image_roi(x, y, self.image_norm,
+                                                       zoom=zoom)
+                                self.draw_roi = patches.Rectangle(
+                                    (x0, y0), size, size,
+                                    linewidth=re.BOX_LINE_WIDTH,
+                                    edgecolor=re.BOX_LINE_COLOR,
+                                    facecolor='none')
+                                self.ax.add_patch(self.draw_roi)
+                                self.main_plot.update()
+                                plt.imshow(roi_img, cmap=self.cmap_list.value)
+                                plt.tight_layout()
                         self.zoom_profile_plot.update()
 
     def show_key(self, event: events.ValueChangeEventArguments, file_path):
@@ -277,9 +280,14 @@ class GuiInteraction(GuiRendering):
         self.histogram_plot.set_visibility(True)
         self.image_info_table.set_visibility(True)
         if self.enable_profile.value or self.enable_zoom.value:
+            with self.zoom_profile_plot:
+                plt.clf()
             self.zoom_profile_plot.set_visibility(True)
         else:
+            with self.zoom_profile_plot:
+                plt.clf()
             self.zoom_profile_plot.set_visibility(False)
+            self.image_norm = None
 
         # Disable other ui-components
         self.main_table.set_visibility(False)
