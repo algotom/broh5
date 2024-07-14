@@ -193,6 +193,7 @@ class GuiRendering:
                 with ui.row().classes("items-center"):
                     self.enable_zoom = ui.checkbox('Zoom')
                     self.zoom_list = ui.select(['2x', '4x', '8x'], value="2x")
+                with ui.row().classes("items-center"):
                     self.enable_profile = ui.checkbox('Profile')
                     self.profile_list = ui.select(['vertical', 'horizontal'],
                                                   value='horizontal')
