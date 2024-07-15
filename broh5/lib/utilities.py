@@ -33,8 +33,9 @@ def get_height_width_screen():
     root = tk.Tk()
     screen_width = root.winfo_screenwidth()
     screen_height = root.winfo_screenheight()
+    dpi = root.winfo_fpixels('1i')
     root.destroy()
-    return screen_height, screen_width
+    return screen_height, screen_width, dpi
 
 
 def __recurse(parent_path, name, obj):
@@ -413,3 +414,42 @@ def load_config():
             return json.load(f)
     except FileNotFoundError:
         return None
+
+
+def get_image_roi(x, y, mat, zoom=2):
+    """
+    Get the square ROI (Region of Interest) of an image given a zoom
+    value and the region center.
+
+    Parameters
+    ----------
+    x : int
+        x-center of the squared ROI
+    y : int
+        y-center of the squared ROI
+    mat : ndarray
+        2d array.
+    zoom : float
+        Zoom-in value of the ROI.
+
+    Returns
+    -------
+    roi : ndarray
+        ROI of the image
+    x_start : int
+        x-start of the ROI
+    y_start : int
+        y_start of the ROI
+    size : int
+        Size of the ROI.
+    """
+    (height, width) = mat.shape
+    min_size = min(height, width)
+    rad = np.clip(int(0.5 * min_size // zoom), 1, min_size // 2 - 1)
+    size = 2 * rad
+    x_start = np.clip(x - rad, 0, width - size)
+    y_start = np.clip(y - rad, 0, height - size)
+    x_stop = x_start + size
+    y_stop = y_start + size
+    roi = mat[y_start:y_stop, x_start:x_stop]
+    return roi, x_start, y_start, size
