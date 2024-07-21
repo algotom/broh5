@@ -63,9 +63,8 @@ Documentation page is at: https://broh5.readthedocs.io. Brief functionalities of
   - If dataset is a 3D array, it's presented as an image. Users can slice 
     through various images and adjust the contrast. Slicing is available for 
     different axes; however, for large datasets, slicing along axis 2 is disabled 
-    due to processing time.
-    - Starting from version 1.3.0, users can choose to display a zoomed area of 
-      the current image or the intensity profile across a mouse-clicked location.
+    due to processing time. Starting from version 1.3.0, users can choose to display 
+    a **zoomed area** of the current image or the **intensity profile** across a mouse-clicked location.
         
   - Datasets that are 1D or 2D arrays will be shown as plots or tables, selectively.
   - Users have the option to save images or tables to disk.
