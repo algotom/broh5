@@ -133,59 +133,61 @@ class GuiInteraction(GuiRendering):
                     (0, self.ax.get_ylim()[-1]))[-1]
                 y = height - 1 - int(y) + int((y_max - height) / 2)
                 if width > x >= 0 and height > y >= 0:
-                    with self.zoom_profile_plot:
-                        plt.clf()
-                        if self.draw_roi is not None:
-                            self.draw_roi.remove()
-                        if self.ver_line is not None:
-                            self.ver_line.remove()
-                        if self.hor_line is not None:
-                            self.hor_line.remove()
-                        self.hor_line, self.ver_line = None, None
-                        self.draw_roi = None
-                        if self.enable_profile.value:
-                            if self.profile_list.value == "vertical":
-                                self.ver_line = Line2D([x, x],
-                                                       [-1, height + 1],
-                                                       color=re.BOX_LINE_COLOR,
-                                                       linewidth=\
-                                                           re.BOX_LINE_WIDTH)
-                                if self.ax is not None:
-                                    self.ax.add_line(self.ver_line)
-                                    list_data = self.image[:, x]
-                                    plt.plot(list_data)
-                                    plt.title(f"Profile at column: {x}")
-                            else:
-                                self.hor_line = Line2D([-1, width + 1], [y, y],
-                                                       color=re.BOX_LINE_COLOR,
-                                                       linewidth=\
-                                                           re.BOX_LINE_WIDTH)
-                                if self.ax is not None:
-                                    self.ax.add_line(self.hor_line)
-                                    list_data = self.image[y]
-                                    plt.plot(list_data)
-                                    plt.title(f"Profile at row: {y}")
-                            plt.xlabel("Index")
-                            plt.ylabel("Intensity")
-                            plt.tight_layout()
-                            self.main_plot.update()
+                    zp_fig = self.zoom_profile_plot.figure
+                    zp_fig.clf()
+                    zp_fig.set_dpi(self.dpi)
+                    zp_ax = zp_fig.gca()
+                    if self.draw_roi is not None:
+                        self.draw_roi.remove()
+                    if self.ver_line is not None:
+                        self.ver_line.remove()
+                    if self.hor_line is not None:
+                        self.hor_line.remove()
+                    self.hor_line, self.ver_line = None, None
+                    self.draw_roi = None
+                    if self.enable_profile.value:
+                        if self.profile_list.value == "vertical":
+                            self.ver_line = Line2D([x, x],
+                                                   [-1, height + 1],
+                                                   color=re.BOX_LINE_COLOR,
+                                                   linewidth=\
+                                                       re.BOX_LINE_WIDTH)
+                            if self.ax is not None:
+                                self.ax.add_line(self.ver_line)
+                                list_data = self.image[:, x]
+                                zp_ax.plot(list_data)
+                                zp_ax.set_title(f"Profile at column: {x}")
                         else:
-                            if self.image_norm is not None:
-                                val = self.zoom_list.value
-                                zoom = int(val.replace("x", ""))
-                                roi_img, x0, y0, size = \
-                                    util.get_image_roi(x, y, self.image_norm,
-                                                       zoom=zoom)
-                                self.draw_roi = patches.Rectangle(
-                                    (x0, y0), size, size,
-                                    linewidth=re.BOX_LINE_WIDTH,
-                                    edgecolor=re.BOX_LINE_COLOR,
-                                    facecolor='none')
-                                self.ax.add_patch(self.draw_roi)
-                                self.main_plot.update()
-                                plt.imshow(roi_img, cmap=self.cmap_list.value)
-                                plt.tight_layout()
-                        self.zoom_profile_plot.update()
+                            self.hor_line = Line2D([-1, width + 1], [y, y],
+                                                   color=re.BOX_LINE_COLOR,
+                                                   linewidth=\
+                                                       re.BOX_LINE_WIDTH)
+                            if self.ax is not None:
+                                self.ax.add_line(self.hor_line)
+                                list_data = self.image[y]
+                                zp_ax.plot(list_data)
+                                zp_ax.set_title(f"Profile at row: {y}")
+                        zp_ax.set_xlabel("Index")
+                        zp_ax.set_ylabel("Intensity")
+                        zp_fig.tight_layout()
+                        self.main_plot.update()
+                    else:
+                        if self.image_norm is not None:
+                            val = self.zoom_list.value
+                            zoom = int(val.replace("x", ""))
+                            roi_img, x0, y0, size = \
+                                util.get_image_roi(x, y, self.image_norm,
+                                                   zoom=zoom)
+                            self.draw_roi = patches.Rectangle(
+                                (x0, y0), size, size,
+                                linewidth=re.BOX_LINE_WIDTH,
+                                edgecolor=re.BOX_LINE_COLOR,
+                                facecolor='none')
+                            self.ax.add_patch(self.draw_roi)
+                            self.main_plot.update()
+                            zp_ax.imshow(roi_img, cmap=self.cmap_list.value)
+                            zp_fig.tight_layout()
+                    self.zoom_profile_plot.update()
 
     def show_key(self, event: events.ValueChangeEventArguments, file_path):
         """
@@ -280,12 +282,10 @@ class GuiInteraction(GuiRendering):
         self.histogram_plot.set_visibility(True)
         self.image_info_table.set_visibility(True)
         if self.enable_profile.value or self.enable_zoom.value:
-            with self.zoom_profile_plot:
-                plt.clf()
+            self.zoom_profile_plot.figure.clf()
             self.zoom_profile_plot.set_visibility(True)
         else:
-            with self.zoom_profile_plot:
-                plt.clf()
+            self.zoom_profile_plot.figure.clf()
             self.zoom_profile_plot.set_visibility(False)
             self.image_norm = None
 
@@ -498,9 +498,8 @@ class GuiInteraction(GuiRendering):
     def __clear_plot(self):
         self.main_plot.figure.clf()
         self.main_plot.update()
-        with self.zoom_profile_plot:
-            plt.clf()
-            self.zoom_profile_plot.update()
+        self.zoom_profile_plot.figure.clf()
+        self.zoom_profile_plot.update()
         with self.histogram_plot:
             plt.clf()
             self.histogram_plot.update()

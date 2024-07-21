@@ -237,8 +237,8 @@ class GuiRendering:
                                           "items-center"):
                         self.main_plot = ui.matplotlib(figsize=self.fig_size,
                                                        dpi=self.dpi)
-                        self.zoom_profile_plot = ui.pyplot(
-                            figsize=self.fig_size, close=False)
+                        self.zoom_profile_plot = ui.matplotlib(
+                            figsize=self.fig_size, dpi=self.dpi)
 
                     # Sliders for adjust the contrast of an image.
                     with ui.row().classes(
