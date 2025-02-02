@@ -93,9 +93,12 @@ def main():
         sys.exit(1)
     signal.signal(signal.SIGINT, signal_handler)  # Back-up shutdown
     try:
-        broh5_app = GuiInteraction()
+        @ui.page('/')
+        def main_page():
+            GuiInteraction()
+        main_page()
         os.environ["NO_NETIFACES"] = "True"
-        app.on_shutdown(lambda: handle_shutdown(broh5_app))
+        app.on_shutdown(lambda: handle_shutdown(main_page))
         app.on_startup(
             lambda: print("Access Broh5 at urls: {}".format(app.urls.union())))
         ui.run(reload=False, title="Browser-based Hdf Viewer", port=args.port,

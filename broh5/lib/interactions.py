@@ -90,6 +90,8 @@ class GuiInteraction(GuiRendering):
         self.columns, self.rows = None, None
         self.current_slice, self.data_1d_2d = None, None
         self.timer = ui.timer(re.UPDATE_RATE, lambda: self.show_data())
+        self.tab_one.on("click", self.__select_tab_one)
+        self.tab_two.on("click", self.__select_tab_two)
         self.selected_tab = 1
         self.last_folder = ""
         self.fig, self.ax = None, None

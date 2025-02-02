@@ -379,11 +379,9 @@ class FilePicker(ui.dialog):
         if self.path.is_dir():
             self.update_grid()
         else:
-            if self.path and self.path.suffix in {'.h5', '.hdf', '.nxs'}:
+            if self.path:
                 self.submit(str(self.path))
             else:
-                ui.notify("Please select a file with the extension .h5, "
-                          ".hdf, or .nxs!")
                 return
 
     async def handle_ok(self):
