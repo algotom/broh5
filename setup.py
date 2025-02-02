@@ -15,7 +15,7 @@ README = (HERE / "README.md").read_text()
 
 setuptools.setup(
     name="broh5",
-    version="1.3.1",
+    version="1.3.2",
     author="Nghia Vo",
     author_email="nvo@bnl.gov",
     description='Browser-based GUI HDF Viewer in Python',
