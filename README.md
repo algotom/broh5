@@ -75,6 +75,7 @@ Update notes
 - 11/02/2024: Added tab for displaying image histogram and statistical information.
 - 30/04/2024: Allow to open/save from the last opened folder.
 - 04/07/2024: Added features for image zooming and intensity profile plotting
+- 01/02/2025: Fixed a bug related to the OK button in FilePicker.
  
 Author
 ------
