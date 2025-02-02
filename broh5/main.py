@@ -95,10 +95,10 @@ def main():
     try:
         @ui.page('/')
         def main_page():
-            GuiInteraction()
-        main_page()
+            return GuiInteraction()
+        broh5_app = main_page()
         os.environ["NO_NETIFACES"] = "True"
-        app.on_shutdown(lambda: handle_shutdown(main_page))
+        app.on_shutdown(lambda: handle_shutdown(broh5_app))
         app.on_startup(
             lambda: print("Access Broh5 at urls: {}".format(app.urls.union())))
         ui.run(reload=False, title="Browser-based Hdf Viewer", port=args.port,

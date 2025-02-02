@@ -7,7 +7,7 @@ dependencies = [
     "hdf5plugin",
     "pillow",
     "matplotlib",
-    "nicegui>=1.4.21"
+    "nicegui>=1.4.21,<2.0"
 ]
 
 HERE = pathlib.Path(__file__).parent

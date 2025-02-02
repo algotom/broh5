@@ -140,13 +140,14 @@ class GuiInteraction(GuiRendering):
                     zp_fig.set_dpi(self.dpi)
                     zp_ax = zp_fig.gca()
                     if self.draw_roi is not None:
-                        self.draw_roi.remove()
+                        self.draw_roi.set_visible(False)
+                        self.draw_roi = None
                     if self.ver_line is not None:
-                        self.ver_line.remove()
+                        self.ver_line.set_visible(False)
+                        self.ver_line = None
                     if self.hor_line is not None:
-                        self.hor_line.remove()
-                    self.hor_line, self.ver_line = None, None
-                    self.draw_roi = None
+                        self.hor_line.set_visible(False)
+                        self.hor_line = None
                     if self.enable_profile.value:
                         if self.profile_list.value == "vertical":
                             self.ver_line = Line2D([x, x],
