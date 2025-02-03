@@ -231,7 +231,7 @@ class GuiRendering:
                 # Tab 1 for data visualization
                 with ui.tab_panel(self.tab_one):
                     # For display data as an image, table, or plot
-                    self.main_table = ui.table(columns=None, rows=None,
+                    self.main_table = ui.table(columns=[], rows=[],
                                                row_key="Index")
                     with ui.row().classes("w-full justify-left no-wrap "
                                           "items-center"):
@@ -264,8 +264,8 @@ class GuiRendering:
                         self.histogram_plot = ui.pyplot(figsize=self.plot_size,
                                                         close=False,
                                                         ).classes("w-full")
-                        self.image_info_table = ui.table(columns=None,
-                                                         rows=None,
+                        self.image_info_table = ui.table(columns=[],
+                                                         rows=[],
                                                          row_key="name")
 
 

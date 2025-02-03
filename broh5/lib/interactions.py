@@ -427,11 +427,9 @@ class GuiInteraction(GuiRendering):
         self.main_plot.update()
 
         if self.selected_tab == 2:
-            rows = util.format_statistical_info(self.image)[0]
-            if self.image_info_table.rows is None:
-                self.image_info_table._props["rows"] = rows
-            else:
-                self.image_info_table.rows[:] = rows
+            rows, columns = util.format_statistical_info(self.image)
+            self.image_info_table.rows[:] = rows
+            self.image_info_table.columns[:] = columns
             self.image_info_table.update()
             with self.histogram_plot:
                 plt.clf()
@@ -455,10 +453,8 @@ class GuiInteraction(GuiRendering):
             self.main_plot.set_visibility(False)
             self.main_table.set_visibility(True)
             rows, columns = util.format_table_from_array(data_obj[:])
-            if self.main_table.rows is None:
-                self.main_table._props["rows"] = rows
-            else:
-                self.main_table.rows[:] = rows
+            self.main_table.rows[:] = rows
+            self.main_table.columns[:] = columns
             self.main_table.update()
         else:
             self.main_plot.set_visibility(True)
