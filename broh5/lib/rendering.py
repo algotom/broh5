@@ -233,8 +233,7 @@ class GuiRendering:
                     # For display data as an image, table, or plot
                     self.main_table = ui.table(columns=[], rows=[],
                                                row_key="Index")
-                    with ui.row().classes("w-full justify-left no-wrap "
-                                          "items-center"):
+                    with ui.row().classes("w-full justify-left items-center"):
                         self.main_plot = ui.matplotlib(figsize=self.fig_size,
                                                        dpi=self.dpi)
                         self.zoom_profile_plot = ui.matplotlib(
