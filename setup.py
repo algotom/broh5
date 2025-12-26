@@ -7,7 +7,7 @@ dependencies = [
     "hdf5plugin",
     "pillow",
     "matplotlib",
-    "nicegui>=2.14"
+    "nicegui>=3.0"
 ]
 
 HERE = pathlib.Path(__file__).parent
@@ -15,7 +15,7 @@ README = (HERE / "README.md").read_text()
 
 setuptools.setup(
     name="broh5",
-    version="1.4.1",
+    version="1.4.2",
     author="Nghia Vo",
     author_email="nvo@bnl.gov",
     description='Browser-based GUI HDF Viewer in Python',

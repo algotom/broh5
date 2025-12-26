@@ -25,7 +25,8 @@ def handle_shutdown(main_app):
     """
     Handle the shutdown process of the application.
     """
-    main_app.shutdown()
+    if main_app is not None:
+        main_app.shutdown()
     print("\n===============")
     print(" Exit the app!")
     print("===============\n")
@@ -93,12 +94,15 @@ def main():
         sys.exit(1)
     signal.signal(signal.SIGINT, signal_handler)  # Back-up shutdown
     try:
+        broh5_app = None
+
         @ui.page('/')
         def main_page():
-            return GuiInteraction()
-        broh5_app = main_page()
-        os.environ["NO_NETIFACES"] = "True"
+            global broh5_app
+            broh5_app = GuiInteraction()
+
         app.on_shutdown(lambda: handle_shutdown(broh5_app))
+        os.environ["NO_NETIFACES"] = "True"
         app.on_startup(
             lambda: print("Access Broh5 at urls: {}".format(app.urls.union())))
         ui.run(reload=False, title="Browser-based Hdf Viewer", port=args.port,
