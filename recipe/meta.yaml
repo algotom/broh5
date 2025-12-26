@@ -1,0 +1,44 @@
+{% set name = "broh5" %}
+{% set version = "1.4.2" %}
+
+package:
+  name: {{ name|lower }}
+  version: {{ version }}
+
+source:
+  path: ..
+
+build:
+  number: 0
+  script: "{{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation"
+  noarch: python
+  entry_points:
+    - broh5 = broh5.main:main
+
+requirements:
+  host:
+    - python >=3.11
+    - pip
+    - setuptools
+  run:
+    - python >=3.11
+    - numpy >1.23
+    - h5py >3.7
+    - hdf5plugin
+    - pillow
+    - matplotlib-base
+    - nicegui >=3.0
+
+test:
+  imports:
+    - broh5
+  requires:
+    - pip
+    - matplotlib-base
+
+about:
+  home: https://github.com/algotom/broh5
+  license: Apache-2.0
+  license_file: LICENSE
+  summary: Browser-based GUI HDF Viewer in Python
+  doc_url: https://broh5.readthedocs.io/
