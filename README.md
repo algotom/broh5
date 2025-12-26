@@ -77,7 +77,8 @@ Update notes
 - 04/07/2024: Added features for image zooming and intensity profile plotting
 - 01/02/2025: Fixed a bug related to the OK button in FilePicker.
 - 05/02/2025: Updated the table-format method for nicegui 2.0 and later.
-- 01/06/2025: Fixed mouse-clicked location problem for nicegui>2.14 
+- 01/06/2025: Fixed mouse-clicked location problem for nicegui>2.14
+- 25/12/2025: Updated main.py to work with nicegui>=3.0
  
 Author
 ------
